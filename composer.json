@@ -1,0 +1,51 @@
+{
+  "name": "khanh-toan-tran/ingrid-grav-utils",
+  "type": "grav-plugin",
+  "description": "InGrid GravCMS utils plugin",
+  "keywords": ["plugin"],
+  "homepage": "https://github.com/informationgrid/ingrid-grav-plugin-utils",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Khanh Toan Tran",
+      "email": "khanh.toan.tran@wemove.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=8.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Grav\\Plugin\\InGridGravUtils\\": "classes/"
+    },
+    "classmap":  ["ingrid-grav-utils.php"],
+    "files": [
+      "classes/utils/IdfHelper.php",
+      "classes/utils/RdfHelper.php",
+      "classes/utils/CodelistHelper.php",
+      "classes/utils/CapabilitiesHelper.php",
+      "classes/utils/StringHelper.php",
+      "classes/utils/LanguageHelper.php",
+      "classes/utils/CountryHelper.php",
+      "classes/utils/MimeTypeHelper.php",
+      "classes/utils/SearchQueryHelper.php",
+      "classes/utils/TMPeriodDurationHelper.php",
+      "classes/utils/ElasticsearchHelper.php",
+      "classes/detail/parser/DetailParserAddressIdfISO.php",
+      "classes/detail/parser/DetailParserMetadataIdfISO.php",
+      "classes/detail/parser/DetailParserMetadataIdfUVP.php",
+      "classes/detail/parser/DetailParserGenericIdf.php",
+      "classes/detail/model/DetailMetadataISO.php",
+      "classes/detail/model/DetailAddressISO.php",
+      "classes/detail/model/DetailMetadataUVP.php",
+      "classes/detail/model/DetailMetadataHTML.php",
+      "classes/service/ElasticsearchService.php",
+      "classes/CodelistController.php",
+      "classes/indexing/codelist/CodelistIndex.php",
+      "classes/RssController.php",
+      "classes/indexing/rss/RssIndex.php",
+      "classes/indexing/rss/RssResult.php"
+    ]
+  }
+}
