@@ -41,9 +41,9 @@
       "classes/detail/model/DetailMetadataUVP.php",
       "classes/detail/model/DetailMetadataHTML.php",
       "classes/service/ElasticsearchService.php",
-      "classes/CodelistController.php",
+      "classes/controller/CodelistController.php",
       "classes/indexing/codelist/CodelistIndex.php",
-      "classes/RssController.php",
+      "classes/controller/RssController.php",
       "classes/indexing/rss/RssIndex.php",
       "classes/indexing/rss/RssResult.php"
     ]
