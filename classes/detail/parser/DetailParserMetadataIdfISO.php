@@ -1206,7 +1206,7 @@ class DetailParserMetadataIdfISO
             $version = IdfHelper::getNodeValue($tmpNode, "./gmd:version/*[self::gco:CharacterString or self::gmx:Anchor]");
             $fileDecompression = IdfHelper::getNodeValue($tmpNode, "./gmd:fileDecompressionTechnique/*[self::gco:CharacterString or self::gmx:Anchor]");
             $specification = IdfHelper::getNodeValue($tmpNode, "./gmd:specification/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($name != "Geographic Markup Language (GML)" && $version != "unknown") {
+            if (($name || $version) && $name != "Geographic Markup Language (GML)" && $version != "unknown") {
                 $map = [];
                 if ($name) {
                     $map["value"] = $name;
