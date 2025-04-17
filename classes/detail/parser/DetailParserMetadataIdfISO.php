@@ -360,7 +360,7 @@ class DetailParserMetadataIdfISO
                 "kind" => "object",
             );
             if ($serviceUrl) {
-                $mapUrl = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType, self::getIdentifier($node, $objType, $tmpNode));
+                $mapUrl = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType, self::getIdentifier($node, $type, $tmpNode));
                 if ($mapUrl) {
                     $item["mapUrl"] = $mapUrl;
                 }
