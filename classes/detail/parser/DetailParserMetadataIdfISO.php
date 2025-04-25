@@ -130,16 +130,6 @@ class DetailParserMetadataIdfISO
     private static function getMapRefs(\SimpleXMLElement $node, DetailMetadataISO $metadata, string $lang): void
     {
 
-        $config = Grav::instance()['config'];
-        $geo_api_url = $config->get('plugins.ingrid-grav-utils.geo_api.url');
-        $geo_api_user = $config->get('plugins.ingrid-grav-utils.geo_api.user');
-        $geo_api_pass = $config->get('plugins.ingrid-grav-utils.geo_api.pass');
-        $geo_api = [
-            'url' => $geo_api_url,
-            'user' => $geo_api_user,
-            'pass' => $geo_api_pass,
-        ];
-
         $regionKey = [];
         if (IdfHelper::getNodeValue($node, "./idf:regionKey") !== null) {
             $regionKey['key'] = IdfHelper::getNodeValue($node, "./idf:regionKey/key");
@@ -149,8 +139,8 @@ class DetailParserMetadataIdfISO
         $metadata->locDescr = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
         $polygon = IdfHelper::getNode($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_BoundingPolygon/gmd:polygon/*");
         if ($polygon !== null) {
-            $metadata->polygonWkt = IdfHelper::transformGML($polygon, $geo_api, 'wkt');
-            $metadata->polygonGeojson = IdfHelper::transformGML($polygon, $geo_api, 'geojson');
+            $metadata->polygonWkt = IdfHelper::transformGML($polygon, 'wkt');
+            $metadata->polygonGeojson = IdfHelper::transformGML($polygon, 'geojson');
         }
         $metadata->bboxes = self::getBBoxes($node, $metadata->title);
         $metadata->geographicElement = self::getGeographicElements($node, $lang);

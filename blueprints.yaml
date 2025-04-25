@@ -78,6 +78,27 @@ form:
               label: PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.SCHEDULED_JOB_LOG_FILE
               size: medium
 
+        tab_geo_api:
+          type: tab
+          title: PLUGIN_INGRID_GRAV_UTILS.GEO_API.TITLE
+          fields:
+            geo_api:
+              type: section
+              title: PLUGIN_INGRID_GRAV_UTILS.GEO_API.TITLE
+              underline: true
+            geo_api.url:
+              type: text
+              label: PLUGIN_INGRID_GRAV_UTILS.GEO_API.URL
+              help: PLUGIN_INGRID_GRAV_UTILS.GEO_API.URL_HELP
+            geo_api.user:
+              type: text
+              label: PLUGIN_INGRID_GRAV_UTILS.GEO_API.USER
+              help: PLUGIN_INGRID_GRAV_UTILS.GEO_API.USER_HELP
+            geo_api.pass:
+              type: text
+              label: PLUGIN_INGRID_GRAV_UTILS.GEO_API.PASS
+              help: PLUGIN_INGRID_GRAV_UTILS.GEO_API.PASS_HELP
+
         tab_rss:
           type: tab
           title: PLUGIN_INGRID_GRAV_UTILS.RSS.TITLE

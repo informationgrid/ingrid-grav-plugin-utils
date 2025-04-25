@@ -21,6 +21,14 @@ en:
       INDEXING_CODELIST_EMPTY: Index not created.
       INDEXING_UNPERMISSION: Insufficient permissions to reindex the search engine database.
       GRAV_MENU_TEXT: Reindexing codelists
+    GEO_API:
+      TITLE: Geo-API
+      URL: URL
+      URL_HELP: URL zur Geo-API. Per Docker-ENV "GEO_API_URL" setzbar.
+      USER: Benutzer (htaccess)
+      USER_HELP: Benutzername zu Geo-API. Per Docker-ENV "GEO_API_USER" setzbar.
+      PASS: Passwort (htaccess)
+      PASS_HELP: Passwort zu Geo-API. Per Docker-ENV "GEO_API_PASS" setzbar.
     RSS:
       TITLE: RSS indexing
       RSS_INDEX_STATUS: RSS indexing
@@ -59,6 +67,14 @@ de:
       INDEXING_CODELIST_EMPTY: Noch nicht indexiert.
       INDEXING_UNPERMISSION: Unzureichende Berechtigungen zum Neuindizieren.
       GRAV_MENU_TEXT: Codelisten (re)indexieren
+    GEO_API:
+      TITLE: Geo-API
+      URL: URL
+      URL_HELP: URL zur Geo-API. Per Docker-ENV "GEO_API_URL" setzbar.
+      USER: Benutzer (htaccess)
+      USER_HELP: Benutzername zu Geo-API. Per Docker-ENV "GEO_API_USER" setzbar.
+      PASS: Passwort (htaccess)
+      PASS_HELP: Passwort zu Geo-API. Per Docker-ENV "GEO_API_PASS" setzbar.
     RSS:
       TITLE: RSS - Indexierung
       RSS_INDEX_STATUS: RSS Indexierung

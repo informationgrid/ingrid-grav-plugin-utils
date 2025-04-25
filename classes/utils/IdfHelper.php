@@ -1,6 +1,7 @@
 <?php
 
 namespace Grav\Plugin;
+use Grav\Common\Grav;
 use Grav\Common\Plugin;
 
 class IdfHelper
@@ -113,14 +114,17 @@ class IdfHelper
         return $array;
     }
 
-    public static function transformGML(\SimpleXMLElement $node, array $api, string $exportFormat): bool|string
+    public static function transformGML(\SimpleXMLElement $node, string $exportFormat): bool|string
     {
+        $config = Grav::instance()['config'];
+        $geo_api = $config->get('plugins.ingrid-grav-utils.geo_api');
+
         $resp = false;
         $data = $node->asXML();
 
-        $api_url = $api['url'];
-        $api_user = $api['user'];
-        $api_pass = $api['pass'];
+        $api_url = $geo_api['url'];
+        $api_user = $geo_api['user'];
+        $api_pass = $geo_api['pass'];
 
         if ($data and !empty($api_url)) {
             $curl = curl_init();
