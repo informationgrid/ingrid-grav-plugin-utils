@@ -7,6 +7,10 @@ codelist_api:
     enabled: true
     at: '*/5 * * * *'
     logs: logs/ingrid-codelist-index.out
+geo_api:
+  url: 'https://geo-api.informationgrid.eu/v1/convert?exportFormat='
+  user:
+  pass:
 rss:
   scheduled_index:
     enabled: true
