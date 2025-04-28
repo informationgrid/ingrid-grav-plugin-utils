@@ -305,7 +305,9 @@ class ElasticsearchService
                                         )
                                     );
                                 } else {
-                                    $shouldGroup[] = $foundObject['facets'][$value]['query']['filter'];
+                                    if ($value) {
+                                        $shouldGroup[] = $foundObject['facets'][$value]['query']['filter'];
+                                    }
                                 }
                             }
                         }
