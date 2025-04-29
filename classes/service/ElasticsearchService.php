@@ -19,6 +19,7 @@ class ElasticsearchService
         string $queryStringOperator,
         array  $requestedFields = [],
         array  $sourceSettings = [],
+        array  $addToSort = [],
     ): string
     {
         if (count($addToSearch) > 0) {
@@ -37,10 +38,10 @@ class ElasticsearchService
             ));
         }
 
+        // Build sort query.
         $sortQuery = array(
             "_score"
         );
-
         if ($sortByDate) {
             $sortQuery[] = array(
                 "t01_object.mod_time" => array(
@@ -48,6 +49,10 @@ class ElasticsearchService
                 )
             );
         }
+        if (count($addToSort) > 0) {
+            $sortQuery[] = $addToSort;
+        }
+
         $source = [];
         if (!empty($sourceSettings['include'])
             || !empty($sourceSettings['exclude'])) {
@@ -60,6 +65,7 @@ class ElasticsearchService
         } else {
             $source = true;
         }
+
         $filter = json_decode($queryFromFacets->filter);
         return json_encode(array(
             "from" => $page * $hitsNum,
