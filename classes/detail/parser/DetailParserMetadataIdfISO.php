@@ -200,20 +200,12 @@ class DetailParserMetadataIdfISO
     private static function getBBoxes(\SimpleXMLElement $node, string $title): array
     {
         $array = [];
-        $geographicIdentifiers = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
-        foreach ($tmpNodes as $tmpNode) {
-            $value = (string) IdfHelper::getNodeValue($tmpNode, ".");
-            $geographicIdentifiers[] = $value;
-        }
-
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox");
-        $count = 0;
         foreach ($tmpNodes as $tmpNode) {
 
-            $value = count($geographicIdentifiers) > $count ? $geographicIdentifiers[$count] : "";
+            $value = IdfHelper::getNodeValue($tmpNode, "../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
             $map = [];
-            $map["title"] = !empty($value) ?: $title;
+            $map["title"] = $value ?? $title;
 
             $map["westBoundLongitude"] = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:westBoundLongitude/gco:Decimal");
             $map["southBoundLatitude"] = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:southBoundLatitude/gco:Decimal");
@@ -221,7 +213,6 @@ class DetailParserMetadataIdfISO
             $map["northBoundLatitude"] = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:northBoundLatitude/gco:Decimal");
 
             $array[] = $map;
-            $count++;
         }
         return $array;
     }
@@ -229,21 +220,13 @@ class DetailParserMetadataIdfISO
     private static function getGeographicElements(\SimpleXMLElement $node, string $lang): array
     {
         $array = [];
-        $geographicIdentifiers = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
-        foreach ($tmpNodes as $tmpNode) {
-            $value = (string) IdfHelper::getNodeValue($tmpNode, ".");
-            $geographicIdentifiers[] = $value;
-        }
-
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox");
-        $count = 0;
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
 
-            $value = count($geographicIdentifiers) > $count ? $geographicIdentifiers[$count] : "";
+            $value = IdfHelper::getNodeValue($tmpNode, "../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
             $map = [];
-            $map["value"] = $value;
+            $map["value"] = $value ?? '';
             $map["type"] = "text";
             $item[] = $map;
 
@@ -273,7 +256,6 @@ class DetailParserMetadataIdfISO
             $item[] = $map;
 
             $array[] = $item;
-            $count++;
         }
         return $array;
     }
