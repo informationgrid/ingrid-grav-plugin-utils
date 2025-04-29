@@ -203,7 +203,7 @@ class DetailParserMetadataIdfISO
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox");
         foreach ($tmpNodes as $tmpNode) {
 
-            $value = IdfHelper::getNodeValue($tmpNode, "../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $value = IdfHelper::getNodeValue($tmpNode, "(../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor])[last()]");
             $map = [];
             $map["title"] = $value ?? $title;
 
@@ -224,7 +224,7 @@ class DetailParserMetadataIdfISO
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
 
-            $value = IdfHelper::getNodeValue($tmpNode, "../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $value = IdfHelper::getNodeValue($tmpNode, "(../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor])[last()]");
             $map = [];
             $map["value"] = $value ?? '';
             $map["type"] = "text";
