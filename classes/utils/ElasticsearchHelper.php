@@ -53,11 +53,15 @@ class ElasticsearchHelper
     {
         $tmpValue = self::getValue($esHit, $key);
         if ($tmpValue) {
-            $time = date("Y-m-d", strtotime(substr($tmpValue,0,14)));
-            $time .= 'T';
-            $time .= date("H:i:s", strtotime(substr($tmpValue,0,14)));
-            $time .= '.000Z';
-            return $time;
+            if (str_contains($tmpValue, 'T')) {
+                return $tmpValue;
+            } else {
+                $time = date("Y-m-d", strtotime(substr($tmpValue,0,14)));
+                $time .= 'T';
+                $time .= date("H:i:s", strtotime(substr($tmpValue,0,14)));
+                $time .= '.000Z';
+                return $time;
+            }
         }
         return null;
     }
