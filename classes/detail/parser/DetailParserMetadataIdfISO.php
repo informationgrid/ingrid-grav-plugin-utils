@@ -845,7 +845,7 @@ class DetailParserMetadataIdfISO
         $metadata->conformity = self::getConformities($node, $lang);
         $metadata->dataformat = self::getDataFormats($node);
 
-        $xpathExpression = "./gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_SecurityConstraints/gmd:classification/gmd:MD_ClassificationCode/@codeListValue";
+        $xpathExpression = "./gmd:dataSetURI/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->geodataLink = IdfHelper::getNodeValue($node, $xpathExpression);
 
         $metadata->media = self::getMedias($node);
