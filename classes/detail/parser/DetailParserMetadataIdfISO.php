@@ -29,7 +29,7 @@ class DetailParserMetadataIdfISO
         $metadata->hasAccessConstraint = IdfHelper::getNodeValue($node, $xpathExpression);
 
         $metadata->previews = self::getPreviews($node);
-        $metadata->mapUrl = self::getMapUrl($node, $metadata->metaClass);
+        $metadata->mapUrl = IdfHelper::getNodeValue($node, './idf:mapUrl') ?? self::getMapUrl($node, $metadata->metaClass);
         $metadata->links = self::getLinkRefs($node, $metadata->metaClass, $lang);
         $metadata->contacts = self::getContactRefs($node, $lang);
 
@@ -381,6 +381,9 @@ class DetailParserMetadataIdfISO
             $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
             $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField");
+            if (empty($attachedToField)) {
+                $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue", ["2000"], $lang);
+            }
             $applicationProfile = IdfHelper::getNodeValue($tmpNode, "./*/gmd:applicationProfile/*[self::gco:CharacterString or self::gmx:Anchor]");
             $size = IdfHelper::getNodeValue($tmpNode, "./../gmd:transferSize/gco:Real");
             $item = array (
@@ -622,7 +625,7 @@ class DetailParserMetadataIdfISO
     private static function getContactRefs(\SimpleXMLElement $node, string $lang): array
     {
         $array = [];
-        $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:pointOfContact/*");
+        $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:pointOfContact/* | ./gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/*");
 
         foreach ($nodes as $tmpNode) {
             $uuid = "";
