@@ -625,7 +625,7 @@ class DetailParserMetadataIdfISO
     private static function getContactRefs(\SimpleXMLElement $node, string $lang): array
     {
         $array = [];
-        $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:pointOfContact/* | ./gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/*");
+        $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:pointOfContact/* | ./gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/*[./gmd:contactInfo]");
 
         foreach ($nodes as $tmpNode) {
             $uuid = "";
