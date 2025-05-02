@@ -22,8 +22,12 @@ class DetailParserMetadataIdfISO
         $xpathExpression = "./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:alternateTitle/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->altTitle = IdfHelper::getNodeValueListCodelistCompare($node, $xpathExpression, ["8010"], $lang, false);
 
-        $xpathExpression = "./idf:abstract/*[self::gco:CharacterString or self::gmx:Anchor] | ./gmd:identificationInfo/*/gmd:abstract/*[self::gco:CharacterString or self::gmx:Anchor]";
+        $xpathExpression = "./idf:abstract/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->summary = IdfHelper::getNodeValue($node, $xpathExpression);
+        if (empty($metadata->summary)) {
+            $xpathExpression = "./gmd:identificationInfo/*/gmd:abstract/*[self::gco:CharacterString or self::gmx:Anchor]";
+            $metadata->summary = IdfHelper::getNodeValue($node, $xpathExpression);
+        }
 
         $xpathExpression = "./idf:hasAccessConstraint";
         $metadata->hasAccessConstraint = IdfHelper::getNodeValue($node, $xpathExpression);
@@ -851,7 +855,7 @@ class DetailParserMetadataIdfISO
         $xpathExpression = "./gmd:dataSetURI/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->geodataLink = IdfHelper::getNodeValue($node, $xpathExpression);
 
-        $metadata->media = self::getMedias($node);
+        $metadata->media = self::getMedias($node, $lang);
         $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributionOrderProcess/gmd:MD_StandardOrderProcess/gmd:orderingInstructions/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->orderInstructions = IdfHelper::getNodeValue($node, $xpathExpression);
     }
@@ -1219,7 +1223,7 @@ class DetailParserMetadataIdfISO
         return $array;
     }
 
-    private static function getMedias(\SimpleXMLElement $node): array
+    private static function getMedias(\SimpleXMLElement $node, string $lang): array
     {
         $array = [];
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions[./gmd:offLine]") ?? [];
@@ -1235,7 +1239,7 @@ class DetailParserMetadataIdfISO
 
             $value = IdfHelper::getNode($tmpNode, "./gmd:offLine/gmd:MD_Medium/gmd:name/gmd:MD_MediumNameCode[./@codeListValue]");
             if ($value) {
-                $map["value"] = IdfHelper::getNodeValue($value, "./@codeListValue");
+                $map["value"] = IdfHelper::getNodeValue($value, "./@codeListValue", ["520"], $lang);
                 $map["type"] = "text";
             }
             $item[] = $map;
