@@ -63,7 +63,7 @@ class DetailParserAddressIdfISO
                 $uuid = IdfHelper::getNodeValue($tmpAddress, "./@uuid");
                 $type = IdfHelper::getNodeValue($tmpAddress, "./idf:addressType");
                 $title = IdfHelper::getNodeValue($tmpAddress, "./idf:addressIndividualName | ./gmd:individualName");
-                if ($title) {
+                if (isset($title)) {
                     $item = array (
                         "uuid" => $uuid,
                         "type" => $type,

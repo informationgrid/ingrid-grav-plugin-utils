@@ -31,7 +31,7 @@ class DetailParserMetadataIdfUVP
     {
         $array = [];
         $value = IdfHelper::getNodeValue($node, './spatialValue');
-        if ($value) {
+        if (isset($value)) {
             $values = explode(':', $value);
             if (!str_contains($values[1], 'null')) {
                 $coords = explode(', ', $values[1]);
@@ -87,7 +87,7 @@ class DetailParserMetadataIdfUVP
         $array = [];
         $dateFrom = IdfHelper::getNodeValue($node, './datePeriod/from');
         $uvpNegativeRelevantDocs = self::getDocs($node, './docs[@type="uvpNegativeRelevantDocs"]/doc');
-        if ($dateFrom || $uvpNegativeRelevantDocs) {
+        if (isset($dateFrom) || !empty($uvpNegativeRelevantDocs)) {
             return array(
                 'dateFrom' => $dateFrom,
                 'uvpNegativeRelevantDocs' => $uvpNegativeRelevantDocs,
