@@ -24,7 +24,7 @@ class DetailParserMetadataIdfISO
 
         $xpathExpression = "./idf:abstract/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->summary = IdfHelper::getNodeValue($node, $xpathExpression);
-        if (empty($metadata->summary)) {
+        if (!isset($metadata->summary)) {
             $xpathExpression = "./gmd:identificationInfo/*/gmd:abstract/*[self::gco:CharacterString or self::gmx:Anchor]";
             $metadata->summary = IdfHelper::getNodeValue($node, $xpathExpression);
         }
@@ -60,12 +60,10 @@ class DetailParserMetadataIdfISO
         $array = [];
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:graphicOverview/gmd:MD_BrowseGraphic");
         foreach ($tmpNodes as $tmpNode) {
-            $map = [];
-            $url = IdfHelper::getNodeValue($tmpNode, "./gmd:fileName/*[self::gco:CharacterString or self::gmx:Anchor]");
-            $descr = IdfHelper::getNodeValue($tmpNode, "./gmd:fileDescription/*[self::gco:CharacterString or self::gmx:Anchor]");
-            $map["url"] = $url;
-            $map["descr"] = $descr;
-            $array[] = $map;
+            $array[] = array(
+                "url" => IdfHelper::getNodeValue($tmpNode, "./gmd:fileName/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "descr" => IdfHelper::getNodeValue($tmpNode, "./gmd:fileDescription/*[self::gco:CharacterString or self::gmx:Anchor]")
+            );
         }
         return $array;
     }
@@ -74,7 +72,7 @@ class DetailParserMetadataIdfISO
     {
         $hierachyLevel = "";
         $hierachyLevelNode = IdfHelper::getNode($node, "./gmd:hierarchyLevel/gmd:MD_ScopeCode");
-        if ($hierachyLevelNode) {
+        if (isset($hierachyLevelNode)) {
             $hierachyLevel = IdfHelper::getNode($hierachyLevelNode, "./@codeListValue");
         }
         $hierachyLevelName = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevelName/*[self::gco:CharacterString or self::gmx:Anchor]");
@@ -134,15 +132,17 @@ class DetailParserMetadataIdfISO
     private static function getMapRefs(\SimpleXMLElement $node, DetailMetadataISO $metadata, string $lang): void
     {
 
-        $regionKey = [];
+        $regionKey = null;
         if (IdfHelper::getNodeValue($node, "./idf:regionKey") !== null) {
-            $regionKey['key'] = IdfHelper::getNodeValue($node, "./idf:regionKey/key");
-            $regionKey['url'] = IdfHelper::getNodeValue($node, "./idf:regionKey/url");
+            $regionKey = array(
+                "key" => IdfHelper::getNodeValue($node, "./idf:regionKey/key"),
+                "url" => IdfHelper::getNodeValue($node, "./idf:regionKey/url")
+            );
         }
         $metadata->regionKey = $regionKey;
         $metadata->locDescr = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
         $polygon = IdfHelper::getNode($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_BoundingPolygon/gmd:polygon/*");
-        if ($polygon !== null) {
+        if (isset($polygon)) {
             $metadata->polygonWkt = IdfHelper::transformGML($polygon, 'wkt');
             $metadata->polygonGeojson = IdfHelper::transformGML($polygon, 'geojson');
         }
@@ -166,19 +166,19 @@ class DetailParserMetadataIdfISO
             $codeSpace = IdfHelper::getNodeValue($tmpNode, "./gmd:codeSpace/*[self::gco:CharacterString or self::gmx:Anchor]");
             $url = null;
             $title = null;
-            if ($code && $codeSpace) {
+            if (isset($code) && isset($codeSpace)) {
                 if (str_contains($code, "EPSG")) {
                     $title = $code;
                 } else {
                     $title = $codeSpace . ":" . $code;
                 }
 
-            } else if ($codeSpace) {
+            } else if (isset($codeSpace)) {
                 $title = $codeSpace;
-            } else if ($code) {
+            } else if (isset($code)) {
                 $title = $code;
             }
-            if ($title) {
+            if (isset($title)) {
                 if (str_starts_with($title, $reference_system_link_replace)) {
                     $title = str_replace($reference_system_link_replace, '', $title);
                 }
@@ -192,10 +192,10 @@ class DetailParserMetadataIdfISO
                         }
                     }
                 }
-                $array[] = [
+                $array[] = array(
                     "title" => $title,
                     "url" => $url,
-                ];
+                );
             }
         }
         return $array;
@@ -206,17 +206,13 @@ class DetailParserMetadataIdfISO
         $array = [];
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox");
         foreach ($tmpNodes as $tmpNode) {
-
-            $value = IdfHelper::getNodeValue($tmpNode, "(../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor])[last()]");
-            $map = [];
-            $map["title"] = $value ?? $title;
-
-            $map["westBoundLongitude"] = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:westBoundLongitude/gco:Decimal");
-            $map["southBoundLatitude"] = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:southBoundLatitude/gco:Decimal");
-            $map["eastBoundLongitude"] = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:eastBoundLongitude/gco:Decimal");
-            $map["northBoundLatitude"] = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:northBoundLatitude/gco:Decimal");
-
-            $array[] = $map;
+            $array[] = array(
+                "title" => IdfHelper::getNodeValue($tmpNode, "(../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor])[last()]") ?? $title,
+                "westBoundLongitude" => (float)IdfHelper::getNodeValue($tmpNode, "./gmd:westBoundLongitude/gco:Decimal"),
+                "southBoundLatitude" => (float)IdfHelper::getNodeValue($tmpNode, "./gmd:southBoundLatitude/gco:Decimal"),
+                "eastBoundLongitude" => (float)IdfHelper::getNodeValue($tmpNode, "./gmd:eastBoundLongitude/gco:Decimal"),
+                "northBoundLatitude" => (float)IdfHelper::getNodeValue($tmpNode, "./gmd:northBoundLatitude/gco:Decimal")
+            );
         }
         return $array;
     }
@@ -228,36 +224,33 @@ class DetailParserMetadataIdfISO
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
 
-            $value = IdfHelper::getNodeValue($tmpNode, "(../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor])[last()]");
-            $map = [];
-            $map["value"] = $value ?? '';
-            $map["type"] = "text";
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "(../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor])[last()]"),
+                "type" => "text"
+            );
 
-            $westBoundLongitude = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:westBoundLongitude/gco:Decimal");
-            $southBoundLatitude = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:southBoundLatitude/gco:Decimal");
-            $eastBoundLongitude = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:eastBoundLongitude/gco:Decimal");
-            $northBoundLatitude = (float)IdfHelper::getNodeValue($tmpNode, "./gmd:northBoundLatitude/gco:Decimal");
+            $westBoundLongitude = IdfHelper::getNodeValue($tmpNode, "./gmd:westBoundLongitude/gco:Decimal");
+            $southBoundLatitude = IdfHelper::getNodeValue($tmpNode, "./gmd:southBoundLatitude/gco:Decimal");
+            $eastBoundLongitude = IdfHelper::getNodeValue($tmpNode, "./gmd:eastBoundLongitude/gco:Decimal");
+            $northBoundLatitude = IdfHelper::getNodeValue($tmpNode, "./gmd:northBoundLatitude/gco:Decimal");
 
-            $map = [];
-            if ($westBoundLongitude && $southBoundLatitude) {
-                $map["value"] = round($westBoundLongitude, 3) . "°/" . round($southBoundLatitude, 3) . "°";
-                $map["type"] = "text";
-            } else {
-                $map["value"] = "";
-                $map["type"] = "text";
+            $value = null;
+            if (isset($westBoundLongitude) && isset($southBoundLatitude)) {
+                $value = round((float) $westBoundLongitude, 3) . "°/" . round((float) $southBoundLatitude, 3) . "°";
             }
-            $item[] = $map;
+            $item[] = array(
+                "value" => $value,
+                "type" => "text"
+            );
 
-            $map = [];
-            if ($eastBoundLongitude && $northBoundLatitude) {
-                $map["value"] = round($eastBoundLongitude, 3) . "°/" . round($northBoundLatitude, 3) . "°";
-                $map["type"] = "text";
-            } else {
-                $map["value"] = "";
-                $map["type"] = "text";
+            $value = null;
+            if (isset($eastBoundLongitude) && isset($northBoundLatitude)) {
+                $value = round((float) $eastBoundLongitude, 3) . "°/" . round((float) $northBoundLatitude, 3) . "°";
             }
-            $item[] = $map;
+            $item[] = array(
+                "value" => $value,
+                "type" => "text"
+            );
 
             $array[] = $item;
         }
@@ -271,35 +264,32 @@ class DetailParserMetadataIdfISO
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
 
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:minimumValue/gco:Real");
-            $map = [];
-            $map["value"] = $value;
-            $map["type"] = "text";
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:minimumValue/gco:Real"),
+                "type" => "text"
+            );
 
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:maximumValue/gco:Real");
-            $map = [];
-            $map["value"] = $value;
-            $map["type"] = "text";
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:maximumValue/gco:Real"),
+                "type" => "text"
+            );
 
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:verticalCRS/gml:VerticalCRS/gml:verticalCS/gml:VerticalCS/gml:axis/gml:CoordinateSystemAxis/@uom", ["102"], $lang);
-            $map = [];
-            $map["value"] = $value;
-            $map["type"] = "text";
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:verticalCRS/gml:VerticalCRS/gml:verticalCS/gml:VerticalCS/gml:axis/gml:CoordinateSystemAxis/@uom", ["102"], $lang),
+                "type" => "text"
+            );
 
             $value = IdfHelper::getNodeValue($tmpNode, "./gmd:verticalCRS/gml:VerticalCRS/gml:verticalDatum/gml:VerticalDatum/gml:name", ["101"], $lang);
-            if(empty($value)) {
+            if(!isset($value)) {
                 $value = IdfHelper::getNodeValue($tmpNode, "./gmd:verticalCRS/gml:VerticalCRS/gml:verticalDatum/gml:VerticalDatum/gml:identifier", ["101"], $lang);
             }
-            if(empty($value)) {
+            if(!isset($value)) {
                 $value = IdfHelper::getNodeValue($tmpNode, "./gmd:verticalCRS/gml:VerticalCRS/gml:name", ["101"], $lang);
             }
-            $map = [];
-            $map["value"] = $value;
-            $map["type"] = "text";
-            $item[] = $map;
+            $item[] = array(
+                "value" => $value,
+                "type" => "text"
+            );
 
             $array[] = $item;
         }
@@ -337,13 +327,13 @@ class DetailParserMetadataIdfISO
             );
             if ($serviceUrl) {
                 $mapUrl = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType, self::getIdentifier($node, $type, $tmpNode));
-                if ($mapUrl) {
+                if (isset($mapUrl)) {
                     $item["mapUrl"] = $mapUrl;
                 }
             }
             if ($serviceType || $serviceVersion) {
                 $service = CapabilitiesHelper::getHitServiceType($serviceVersion, $serviceType);
-                if ($service) {
+                if (isset($service)) {
                     $item["serviceType"] = $service;
                 }
             }
@@ -385,7 +375,7 @@ class DetailParserMetadataIdfISO
             $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
             $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField");
-            if (empty($attachedToField)) {
+            if (!isset($attachedToField)) {
                 $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue", ["2000"], $lang);
             }
             $applicationProfile = IdfHelper::getNodeValue($tmpNode, "./*/gmd:applicationProfile/*[self::gco:CharacterString or self::gmx:Anchor]");
@@ -478,7 +468,7 @@ class DetailParserMetadataIdfISO
         if ($objType == 3) {
             $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata[./srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor][contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), 'getcap')]]/srv:connectPoint";
             $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
-            if (empty($tmpNodes)) {
+            if (!empty($tmpNodes)) {
                 $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint";
                 $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
             }
@@ -488,7 +478,7 @@ class DetailParserMetadataIdfISO
                 $xpathExpression = "./gmd:identificationInfo/*/srv:serviceTypeVersion/*[self::gco:CharacterString or self::gmx:Anchor]";
                 $serviceTypeVersion = IdfHelper::getNodeValue($node, $xpathExpression);
                 $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
-                if (!empty($url) && !empty($serviceTypeVersion)) {
+                if (isset($url) && isset($serviceTypeVersion)) {
                     $url = CapabilitiesHelper::getCapabilitiesUrl($url, $serviceTypeVersion, $serviceType);
                 }
                 $description = IdfHelper::getNodeValue($tmpNode, "./../srv:operationDescription/*[self::gco:CharacterString or self::gmx:Anchor]");
@@ -561,7 +551,7 @@ class DetailParserMetadataIdfISO
                 }
             }
         }
-        if ($restriction) {
+        if (isset($restriction)) {
             $array['restriction'] = $restriction;
         }
         if (!empty($constraints)) {
@@ -588,13 +578,13 @@ class DetailParserMetadataIdfISO
         $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints[./gmd:accessConstraints]/*");
         foreach ($nodes as $tmpNode) {
             $value = IdfHelper::getNodeValue($tmpNode, "./gmd:MD_RestrictionCode[not(contains(@codeListValue, 'otherRestrictions'))]");
-            if ($value) {
+            if (isset($value)) {
                 if (!in_array($value, $constraints)) {
                     $constraints[] = $value;
                 }
             } else {
                 $value = IdfHelper::getNodeValue($tmpNode, "./*[self::gco:CharacterString or self::gmx:Anchor][not(starts-with(text(),'{'))]");
-                if ($value) {
+                if (isset($value)) {
                     if (!in_array($value, $constraints)) {
                         $constraints[] = $value;
                     }
@@ -614,7 +604,7 @@ class DetailParserMetadataIdfISO
         $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints[./gmd:useLimitation]/*");
         foreach ($nodes as $tmpNode) {
             $value = IdfHelper::getNodeValue($tmpNode, "./*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value) {
+            if (isset($value)) {
                 if (!in_array($value, $constraints)) {
                     $constraints[] = self::removeConstraintPrefix($value);
                 }
@@ -689,7 +679,7 @@ class DetailParserMetadataIdfISO
             $phone = IdfHelper::getNodeValue($tmpNode, "./gmd:contactInfo/gmd:CI_Contact/gmd:phone/gmd:CI_Telephone/gmd:voice/*[self::gco:CharacterString or self::gmx:Anchor]");
             $facsimile = IdfHelper::getNodeValue($tmpNode, "./gmd:contactInfo/gmd:CI_Contact/gmd:phone/gmd:CI_Telephone/gmd:facsimile/*[self::gco:CharacterString or self::gmx:Anchor]");
             $url = IdfHelper::getNodeValue($tmpNode, "./gmd:contactInfo/gmd:CI_Contact/gmd:onlineResource/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
-            if ($url) {
+            if (isset($url)) {
                 $url = str_starts_with($url, 'http') ? $url : 'https://' . $url;
             }
             $service_time = IdfHelper::getNodeValue($tmpNode, "./gmd:contactInfo/gmd:CI_Contact/gmd:hoursOfService/*[self::gco:CharacterString or self::gmx:Anchor]");
@@ -877,9 +867,9 @@ class DetailParserMetadataIdfISO
             $keywords = IdfHelper::getNodeValueList($keywordsNode, './gmd:keyword/*[self::gco:CharacterString or self::gmx:Anchor]');
             foreach ($keywords as $keyword) {
                 $keyword = iconv('UTF-8', 'UTF-8', $keyword);
-                if (empty($thesaurusName)) {
+                if (!isset($thesaurusName)) {
                     $tmpValue = CodelistHelper::getCodelistEntryByData(['6400'], $keyword, $lang);
-                    if (empty($tmpValue)){
+                    if (!isset($tmpValue)){
                         $tmpValue = $keyword;
                     }
                     if (!in_array($tmpValue, $searchTerms)) {
@@ -889,7 +879,7 @@ class DetailParserMetadataIdfISO
                     if (!str_contains(strtolower($thesaurusName), 'service')) {
                         if (str_contains(strtolower($thesaurusName), 'concepts')) {
                             $tmpValue = CodelistHelper::getCodelistEntry(['5200'], $keyword, $lang);
-                            if (empty($tmpValue)){
+                            if (!isset($tmpValue)){
                                 $tmpValue = $keyword;
                             }
                             if (!in_array($tmpValue, $gemetConcepts)) {
@@ -897,7 +887,7 @@ class DetailParserMetadataIdfISO
                             }
                         } else if (str_contains(strtolower($thesaurusName), 'priority')) {
                             $tmpValue = CodelistHelper::getCodelistEntry(['6300'], $keyword, $lang);
-                            if (empty($tmpValue)){
+                            if (!isset($tmpValue)){
                                 $tmpValue = $keyword;
                             }
                             if (!in_array($tmpValue, $priorityDataset)) {
@@ -905,7 +895,7 @@ class DetailParserMetadataIdfISO
                             }
                         } else if (str_contains(strtolower($thesaurusName), 'inspire')) {
                             $tmpValue = CodelistHelper::getCodelistEntryByLocalisation(['6100'], $keyword, $lang);
-                            if (empty($tmpValue)){
+                            if (!isset($tmpValue)){
                                 $tmpValue = $keyword;
                             }
                             if (!in_array($tmpValue, $inspireThemes)) {
@@ -913,7 +903,7 @@ class DetailParserMetadataIdfISO
                             }
                         } else if (str_contains(strtolower($thesaurusName), 'spatial scope')) {
                             $tmpValue = CodelistHelper::getCodelistEntry(['6360'], $keyword, $lang);
-                            if (empty($tmpValue)){
+                            if (!isset($tmpValue)){
                                 $tmpValue = $keyword;
                             }
                             if (!in_array($tmpValue, $spatialScope)) {
@@ -933,7 +923,7 @@ class DetailParserMetadataIdfISO
                             }
                         } else {
                             $tmpValue = CodelistHelper::getCodelistEntryByData(['6400'], $keyword, $lang);
-                            if (empty($tmpValue)){
+                            if (!isset($tmpValue)){
                                 $tmpValue = $keyword;
                             }
                             if (!in_array($tmpValue, $searchTerms)) {
@@ -959,29 +949,20 @@ class DetailParserMetadataIdfISO
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:spatialRepresentationInfo/gmd:MD_VectorSpatialRepresentation") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:topologyLevel/gmd:MD_TopologyLevelCode/@codeListValue", ["528"], $lang);
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:topologyLevel/gmd:MD_TopologyLevelCode/@codeListValue", ["528"], $lang),
+                "type" => "text"
+            );
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:geometricObjects/gmd:MD_GeometricObjects/gmd:geometricObjectType/gmd:MD_GeometricObjectTypeCode/@codeListValue", ["515"], $lang);
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:geometricObjects/gmd:MD_GeometricObjects/gmd:geometricObjectType/gmd:MD_GeometricObjectTypeCode/@codeListValue", ["515"], $lang),
+                "type" => "text"
+            );
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:geometricObjects/gmd:MD_GeometricObjects/gmd:geometricObjectCount/gco:Integer");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:geometricObjects/gmd:MD_GeometricObjects/gmd:geometricObjectCount/gco:Integer"),
+                "type" => "text"
+            );
 
             $array[] = $item;
         }
@@ -993,29 +974,21 @@ class DetailParserMetadataIdfISO
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:portrayalCatalogueInfo/gmd:MD_PortrayalCatalogueReference/gmd:portrayalCatalogueCitation/gmd:CI_Citation") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:date/gmd:CI_Date/gmd:date/*[self::gco:Date or self::gco:DateTime]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "date";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "type" => "text"
+            );
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:edition/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:date/gmd:CI_Date/gmd:date/*[self::gco:Date or self::gco:DateTime]"),
+                "type" => "date"
+            );
+
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:edition/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "type" => "text"
+            );
 
             $array[] = $item;
         }
@@ -1028,29 +1001,21 @@ class DetailParserMetadataIdfISO
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:contentInfo/gmd:MD_FeatureCatalogueDescription/gmd:featureCatalogueCitation/gmd:CI_Citation") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:date/gmd:CI_Date/gmd:date/*[self::gco:Date or self::gco:DateTime]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "date";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "type" => "text"
+            );
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:edition/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:date/gmd:CI_Date/gmd:date/*[self::gco:Date or self::gco:DateTime]"),
+                "type" => "date"
+            );
+
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:edition/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "type" => "text"
+            );
 
             $array[] = $item;
         }
@@ -1074,7 +1039,7 @@ class DetailParserMetadataIdfISO
         foreach ($tmpNodes as $tmpNode) {
             $value = IdfHelper::getNodeValue($tmpNode, ".");
             $unit = IdfHelper::getNodeValue($tmpNode, "./@uom");
-            if (strcasecmp($unit, "meter") == 0) {
+            if (str_contains($unit, "meter")) {
                 $unit = 'm';
             }
             $meters[] = $value . " " . $unit;
@@ -1091,29 +1056,21 @@ class DetailParserMetadataIdfISO
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./srv:operationDescription/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "type" => "text"
+            );
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./srv:operationDescription/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "type" => "text"
+            );
+
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL"),
+                "type" => "text"
+            );
 
             $array[] = $item;
         }
@@ -1126,50 +1083,48 @@ class DetailParserMetadataIdfISO
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency[./gmd:result/gmd:DQ_ConformanceResult]") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "date";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "type" => "text"
+            );
 
-            $map = [];
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date"),
+                "type" => "date"
+            );
+
             $tmpSubNode = IdfHelper::getNode($tmpNode, "./gmd:result/gmd:DQ_ConformanceResult/gmd:pass");
+            $value = null;
+            $title = null;
             if (!is_null($tmpSubNode)) {
                 $value = IdfHelper::getNodeValue($tmpSubNode, "./gco:Boolean");
                 if (is_null($value)) {
                     $value = "";
                 }
                 if (!is_null($value)) {
-                    $map["value"] = $value;
-                    $map["type"] = "symbol";
                     $title = CodelistHelper::getCodelistEntry(["6000"], "3", $lang);
                     if (strcmp($value, "true") == 0) {
                         $title = CodelistHelper::getCodelistEntry(["6000"], "1", $lang);
                     } elseif (strcmp($value, "false") == 0) {
                         $title = CodelistHelper::getCodelistEntry(["6000"], "2", $lang);
                     }
-                    $map["title"] = $title;
                 }
             }
-            $item[] = $map;
+            $item[] = array(
+                "value" => $value,
+                "type" => "symbol",
+                "title" => $title
+            );
 
-            $map = [];
             $value = IdfHelper::getNodeValue($tmpNode, "./gmd:result/gmd:DQ_ConformanceResult/gmd:explanation/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value && strcasecmp($value, "see the referenced specification") != 0) {
-                $map["value"] = $value;
-                $map["type"] = "text";
+            if (isset($value) && str_contains($value, "see the referenced specification")) {
+                $value = null;
             }
-            $item[] = $map;
+            $item[] = array(
+                "value" => $value,
+                "type" => "text"
+            );
             $array[] = $item;
         }
         return $array;
@@ -1185,36 +1140,26 @@ class DetailParserMetadataIdfISO
             $version = IdfHelper::getNodeValue($tmpNode, "./gmd:version/*[self::gco:CharacterString or self::gmx:Anchor]");
             $fileDecompression = IdfHelper::getNodeValue($tmpNode, "./gmd:fileDecompressionTechnique/*[self::gco:CharacterString or self::gmx:Anchor]");
             $specification = IdfHelper::getNodeValue($tmpNode, "./gmd:specification/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if (($name || $version) && $name != "Geographic Markup Language (GML)" && $version != "unknown") {
-                $map = [];
-                if ($name) {
-                    $map["value"] = $name;
-                    $map["type"] = "text";
-                }
-                $item[] = $map;
+            if ((isset($name) || isset($version)) && $name != "Geographic Markup Language (GML)" && $version != "unknown") {
+                $item[] = array(
+                    "value" => $name,
+                    "type" => "text"
+                );
 
-                $map = [];
-                if ($version) {
-                    $map["value"] = $version;
-                    $map["type"] = "text";
-                }
-                $item[] = $map;
+                $item[] = array(
+                    "value" => $version,
+                    "type" => "text"
+                );
 
-                $map = [];
+                $item[] = array(
+                    "value" => $fileDecompression,
+                    "type" => "text"
+                );
 
-                if ($fileDecompression) {
-                    $map["value"] = $fileDecompression;
-                    $map["type"] = "text";
-                }
-                $item[] = $map;
-
-                $map = [];
-
-                if ($specification) {
-                    $map["value"] = $specification;
-                    $map["type"] = "text";
-                }
-                $item[] = $map;
+                $item[] = array(
+                    "value" => $specification,
+                    "type" => "text"
+                );
             }
             if ($item) {
                 $array[] = $item;
@@ -1229,7 +1174,6 @@ class DetailParserMetadataIdfISO
         $tmpNodes = IdfHelper::getNodeList($node, "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions[./gmd:offLine]") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
-            $map = [];
             $unit = "MB";
 
             $value = IdfHelper::getNodeValue($tmpNode, "./gmd:unitsOfDistribution/*[self::gco:CharacterString or self::gmx:Anchor]");
@@ -1237,28 +1181,21 @@ class DetailParserMetadataIdfISO
                 $unit = $value;
             }
 
-            $value = IdfHelper::getNode($tmpNode, "./gmd:offLine/gmd:MD_Medium/gmd:name/gmd:MD_MediumNameCode[./@codeListValue]");
-            if ($value) {
-                $map["value"] = IdfHelper::getNodeValue($value, "./@codeListValue", ["520"], $lang);
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:offLine/gmd:MD_Medium/gmd:name/gmd:MD_MediumNameCode/@codeListValue", ["520"], $lang),
+                "type" => "text"
+            );
 
-            $map = [];
             $value = IdfHelper::getNodeValue($tmpNode, "./gmd:transferSize/gco:Real");
-            if ($value) {
-                $map["value"] = $value . " " . $unit;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => $value ? $value . " " . $unit : null,
+                "type" => "text"
+            );
 
-            $map = [];
-            $value = IdfHelper::getNodeValue($tmpNode, "./gmd:offLine/gmd:MD_Medium/gmd:mediumNote/*[self::gco:CharacterString or self::gmx:Anchor]");
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:offLine/gmd:MD_Medium/gmd:mediumNote/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "type" => "text"
+            );
             $array[] = $item;
         }
         return $array;
@@ -1301,7 +1238,7 @@ class DetailParserMetadataIdfISO
         foreach ($tmpNodes as $tmpNode) {
             $value = IdfHelper::getNodeValue($tmpNode, "./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record");
             $symbol = IdfHelper::getNodeValue($tmpNode, "./gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/gml:UnitDefinition/gml:catalogSymbol");
-            if(!is_null($value) && !is_null($symbol)) {
+            if (isset($value) && isset($symbol)) {
                 $value = $value . " " . $symbol;
             }
         }
@@ -1318,26 +1255,21 @@ class DetailParserMetadataIdfISO
             $description = IdfHelper::getNodeValue($tmpNode, "./gmd:measureDescription/*[self::gco:CharacterString or self::gmx:Anchor]");
             $item = [];
 
-            $map = [];
-            if ($name) {
-                $map["value"] = $name;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => $name,
+                "type" => "text"
+            );
 
-            $map = [];
-            if ($value) {
-                $map["value"] = $value;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => $value,
+                "type" => "text"
+            );
 
-            $map = [];
-            if ($description) {
-                $map["value"] = $description;
-                $map["type"] = "text";
-            }
-            $item[] = $map;
+            $item[] = array(
+                "value" => $description,
+                "type" => "text"
+            );
+
             $array[] = $item;
         }
         return $array;
@@ -1348,9 +1280,10 @@ class DetailParserMetadataIdfISO
         $metadata->modTime = IdfHelper::getNodeValue($node, "./gmd:dateStamp/*[self::gco:Date or self::gco:DateTime or .]");
         $metadata->lang = LanguageHelper::getNameFromIso639_2(IdfHelper::getNodeValue($node, "./gmd:language/gmd:LanguageCode/@codeListValue"), $lang);
         $metadata->hierarchyLevel = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue", ["525"], $lang);
-        $contact_meta = [];
-        $contact_meta["mail"] = IdfHelper::getNodeValueList($node, "./gmd:contact/*/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/*[self::gco:CharacterString or self::gmx:Anchor]");
-        $contact_meta["role"] = IdfHelper::getNodeValue($node, "./gmd:contact/*/gmd:role/gmd:CI_RoleCode/@codeListValue", ["505"], $lang);
+        $contact_meta = array(
+            "mail" => IdfHelper::getNodeValueList($node, "./gmd:contact/*/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/*[self::gco:CharacterString or self::gmx:Anchor]"),
+            "role" => IdfHelper::getNodeValue($node, "./gmd:contact/*/gmd:role/gmd:CI_RoleCode/@codeListValue", ["505"], $lang)
+        );
         $metadata->contactMeta = $contact_meta;
         $metadata->dataSourceName = $dataSourceName;
         $metadata->providers = $providers;
@@ -1364,32 +1297,32 @@ class DetailParserMetadataIdfISO
         $value = null;
         if ($type == '1') {
             $value = IdfHelper::getNodeValue($node, './idf:mapUrl');
-            if ($value) {
+            if (isset($value)) {
                $value = CapabilitiesHelper::getMapUrl($value, null, null, self::getIdentifier($node, $type));
             }
-            if (!$value) {
+            if (!isset($value)) {
                 $crossRefNodes = IdfHelper::getNodeList($node, './idf:crossReference');
                 foreach ($crossRefNodes as $crossRefNode) {
                     $mapUrl =  IdfHelper::getNodeValue($crossRefNode, "./idf:mapUrl");
-                    if ($mapUrl) {
+                    if (isset($mapUrl)) {
                         $value = $mapUrl;
                     } else {
                         $serviceUrl =  IdfHelper::getNodeValue($crossRefNode, "./idf:serviceUrl");
                         $serviceType =  IdfHelper::getNodeValue($crossRefNode, "./idf:serviceType");
                         $serviceVersion =  IdfHelper::getNodeValue($crossRefNode, "./idf:serviceVersion");
-                        if (!empty($serviceUrl)) {
+                        if (isset($serviceUrl)) {
                             $value = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType, self::getIdentifier($node, $type));
                         }
                     }
                 }
             }
-            if (!$value) {
+            if (!isset($value)) {
                 $transOptionNodes = IdfHelper::getNodeList($node, './gmd:distributionInfo/*/gmd:transferOptions');
                 foreach ($transOptionNodes as $transOptionNode) {
                     $url = IdfHelper::getNodeValue($transOptionNode, './gmd:MD_DigitalTransferOptions/gmd:onLine/*/gmd:linkage/gmd:URL');
-                    if ($url) {
+                    if (isset($url)) {
                         $serviceType = IdfHelper::getNodeValue($transOptionNode, "./gmd:MD_DigitalTransferOptions/gmd:onLine/*/gmd:function/gmd:CI_OnLineFunctionCode");
-                        if (($serviceType != null && (strtolower(trim($serviceType)) == 'view' || strtolower(trim($serviceType)) == 'wms') || strtolower(trim($serviceType)) == 'wmts') &&
+                        if ((isset($serviceType) && (strtolower(trim($serviceType)) == 'view' || strtolower(trim($serviceType)) == 'wms') || strtolower(trim($serviceType)) == 'wmts') &&
                             ((str_contains(strtolower($url), 'request=getcapabilities') && (str_contains(strtolower($url), 'service=wms')) || str_contains(strtolower($url), 'service=wmts')) ||
                                 str_contains(strtolower($url), 'wmtscapabilities.xml'))
                         ) {
@@ -1400,7 +1333,7 @@ class DetailParserMetadataIdfISO
             }
         } else if ($type == '3') {
             $value = IdfHelper::getNodeValue($node, './idf:mapUrl');
-            if (!$value) {
+            if (isset($value)) {
                 $serviceUrl = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor][text() = 'GetCapabilities']/../../srv:connectPoint//gmd:URL");
                 $serviceType = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceType/*");
                 $serviceVersion = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceTypeVersion/*");
@@ -1435,7 +1368,7 @@ class DetailParserMetadataIdfISO
 
     private static function addToArray(array &$array, string $id, mixed $value): void
     {
-        if (!empty($value)) {
+        if (isset($value)) {
             $array[$id] = $value;
         }
     }
