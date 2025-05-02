@@ -737,10 +737,10 @@ class DetailParserMetadataIdfISO
         $metadata->environmentDescription = IdfHelper::getNodeValue($node, $xpathExpression);
 
         $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage/gmd:processStep/gmd:LI_ProcessStep/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]";
-        $metadata->processStepDescription = IdfHelper::getNodeValue($node, $xpathExpression);
+        $metadata->processStepDescriptions = IdfHelper::getNodeValueList($node, $xpathExpression);
 
         $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage/gmd:source/gmd:LI_Source/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]";
-        $metadata->sourceDescription = IdfHelper::getNodeValue($node, $xpathExpression);
+        $metadata->sourceDescriptions = IdfHelper::getNodeValueList($node, $xpathExpression);
 
         $xpathExpression = "./gmd:identificationInfo/*/gmd:supplementalInformation/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->supplementalInformation = IdfHelper::getNodeValue($node, $xpathExpression);

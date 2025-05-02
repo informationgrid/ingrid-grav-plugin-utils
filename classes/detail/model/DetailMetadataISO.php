@@ -58,8 +58,8 @@ class DetailMetadataISO
     public ?string $serviceType;
     public ?array $serviceTypeVersions;
     public ?string $environmentDescription;
-    public ?string $processStepDescription;
-    public ?string $sourceDescription;
+    public ?array $processStepDescriptions;
+    public ?array $sourceDescriptions;
     public ?string $supplementalInformation;
     public ?string $supplementalInformationAbstract;
     public ?string $operationConnectPoint;
