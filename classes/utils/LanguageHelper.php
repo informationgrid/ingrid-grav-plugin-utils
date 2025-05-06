@@ -102,7 +102,7 @@ class LanguageHelper
         306 => "Low Saxon",
     ];
 
-    public static function getNameFromIso639_2(?string $isoCode, string $lang): string
+    public static function getNameFromIso639_2(?string $isoCode, string $lang): ?string
     {
         $name = null;
         if (isset($isoCode)) {
