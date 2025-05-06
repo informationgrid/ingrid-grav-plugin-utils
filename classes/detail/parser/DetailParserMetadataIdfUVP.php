@@ -49,7 +49,7 @@ class DetailParserMetadataIdfUVP
     private static function getSteps(\SimpleXMLElement $node): array
     {
         $array = [];
-        $nodes = IdfHelper::getNodeList($node, "./steps/step");
+        $nodes = IdfHelper::getNodeList($node, "./steps/step[./*]");
         if (!empty($nodes)) {
             foreach ($nodes as $tmpNode) {
                 $type = IdfHelper::getNodeValue($tmpNode, './@type');

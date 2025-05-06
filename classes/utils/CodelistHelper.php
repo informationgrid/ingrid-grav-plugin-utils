@@ -206,7 +206,7 @@ class CodelistHelper
         try {
             $codelistPartner = self::getCodelist('110');
             if ($codelistPartner) {
-                $entries = self::getNodeList($codelistPartner, '//de.ingrid.codelists.model.CodeListEntry');
+                $entries = self::getNodeList($codelistPartner, '//de.ingrid.codelists.model.CodeListEntry[./*]');
                 foreach ($entries as $entry) {
                     $fields = self::getNode($entry, './fields');
                     $id = self::getNodeValue($entry, './id');

@@ -58,7 +58,7 @@ class DetailParserMetadataIdfISO
     private static function getPreviews(\SimpleXMLElement $node): array
     {
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:graphicOverview/gmd:MD_BrowseGraphic");
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:graphicOverview/gmd:MD_BrowseGraphic[./*]");
         foreach ($tmpNodes as $tmpNode) {
             $array[] = array(
                 "url" => IdfHelper::getNodeValue($tmpNode, "./gmd:fileName/*[self::gco:CharacterString or self::gmx:Anchor]"),
@@ -160,7 +160,7 @@ class DetailParserMetadataIdfISO
         $reference_system_link_replace = $config->get('themes.' . $theme . '.hit_detail.reference_system_link_replace');
 
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier");
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier[./*]");
         foreach ($tmpNodes as $tmpNode) {
             $code = IdfHelper::getNodeValue($tmpNode, "./gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
             $codeSpace = IdfHelper::getNodeValue($tmpNode, "./gmd:codeSpace/*[self::gco:CharacterString or self::gmx:Anchor]");
@@ -204,7 +204,7 @@ class DetailParserMetadataIdfISO
     private static function getBBoxes(\SimpleXMLElement $node, string $title): array
     {
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox");
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox[./*]");
         foreach ($tmpNodes as $tmpNode) {
             $array[] = array(
                 "title" => IdfHelper::getNodeValue($tmpNode, "(../preceding-sibling::gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor])[last()]") ?? $title,
@@ -220,7 +220,7 @@ class DetailParserMetadataIdfISO
     private static function getGeographicElements(\SimpleXMLElement $node, string $lang): array
     {
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox");
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox[./*]");
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
 
@@ -260,7 +260,7 @@ class DetailParserMetadataIdfISO
     private static function getAreaHeight(\SimpleXMLElement $node, string $lang): array
     {
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:verticalElement/gmd:EX_VerticalExtent");
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:verticalElement/gmd:EX_VerticalExtent[./*]");
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
 
@@ -368,7 +368,7 @@ class DetailParserMetadataIdfISO
         }
 
         // Weitere Verweise
-        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/gmd:function/*/@codeListValue='download')]";
+        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/gmd:function/*/@codeListValue='download')][./*]";
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($tmpNodes as $tmpNode) {
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
@@ -415,7 +415,7 @@ class DetailParserMetadataIdfISO
         }
 
         // Übergeordnete Objekte
-        $xpathExpression = "./idf:superiorReference";
+        $xpathExpression = "./idf:superiorReference[./*]";
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($tmpNodes as $tmpNode) {
             $uuid = IdfHelper::getNodeValue($tmpNode, "./@uuid");
@@ -423,8 +423,8 @@ class DetailParserMetadataIdfISO
             $description = IdfHelper::getNodeValue($tmpNode, "./idf:description");
             $type = IdfHelper::getNodeValue($tmpNode, "./idf:objectType");
             $previews = IdfHelper::getNodeValueList($tmpNode, "./idf:graphicOverview");
-            $extMapUrl = IdfHelper::getNodeList($tmpNode, "./idf:extMapUrl");
-            $mapUrl = IdfHelper::getNodeList($tmpNode, "./idf:mapUrl");
+            $extMapUrl = IdfHelper::getNodeList($tmpNode, "./idf:extMapUrl[./*]");
+            $mapUrl = IdfHelper::getNodeList($tmpNode, "./idf:mapUrl[./*]");
             $item = array (
                 "uuid" => $uuid,
                 "title" => $title,
@@ -440,16 +440,16 @@ class DetailParserMetadataIdfISO
         }
 
         // Untergeordnete Objekte
-        $xpathExpression = "./idf:subordinatedReference";
+        $xpathExpression = "./idf:subordinatedReference[./*]";
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($tmpNodes as $tmpNode) {
             $uuid = IdfHelper::getNodeValue($tmpNode, "./@uuid");
             $title = IdfHelper::getNodeValue($tmpNode, "./idf:objectName");
             $description = IdfHelper::getNodeValue($tmpNode, "./idf:description");
             $type = IdfHelper::getNodeValue($tmpNode, "./idf:objectType");
-            $previews = IdfHelper::getNodeList($tmpNode, "./idf:graphicOverview");
-            $extMapUrl = IdfHelper::getNodeList($tmpNode, "./idf:extMapUrl");
-            $mapUrl = IdfHelper::getNodeList($tmpNode, "./idf:mapUrl");
+            $previews = IdfHelper::getNodeList($tmpNode, "./idf:graphicOverview[./*]");
+            $extMapUrl = IdfHelper::getNodeList($tmpNode, "./idf:extMapUrl[./*]");
+            $mapUrl = IdfHelper::getNodeList($tmpNode, "./idf:mapUrl[./*]");
             $item = array (
                 "uuid" => $uuid,
                 "title" => $title,
@@ -466,10 +466,10 @@ class DetailParserMetadataIdfISO
 
         // URL des Zuganges
         if ($objType == 3) {
-            $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata[./srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor][contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), 'getcap')]]/srv:connectPoint";
+            $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata[./srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor][contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), 'getcap')]]/srv:connectPoint[./*]";
             $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
             if (!empty($tmpNodes)) {
-                $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint";
+                $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint[./*]";
                 $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
             }
             foreach ($tmpNodes as $tmpNode) {
@@ -630,7 +630,7 @@ class DetailParserMetadataIdfISO
                 $role = IdfHelper::getNodeValue($roleNode, "./@codeListValue");
             }
             $addresses = [];
-            $tmpAddresses = IdfHelper::getNodeList($tmpNode, "./idf:hierarchyParty");
+            $tmpAddresses = IdfHelper::getNodeList($tmpNode, "./idf:hierarchyParty[./*]");
             if(empty($tmpAddresses)) {
                 $tmpAddresses = IdfHelper::getNodeList($tmpNode, ".");
             }
@@ -833,7 +833,7 @@ class DetailParserMetadataIdfISO
         $xpathExpression = "./gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords[gmd:thesaurusName/gmd:CI_Citation/gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]='Further legal basis']/gmd:keyword/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->legalBasis = IdfHelper::getNodeList($node, $xpathExpression);
 
-        $xpathExpression = "./idf:exportCriteria";
+        $xpathExpression = "./idf:exportCriteria[./*]";
         $metadata->exportCriteria = IdfHelper::getNodeList($node, $xpathExpression);
 
         $xpathExpression = "./gmd:identificationInfo/*/gmd:language/gmd:LanguageCode/@codeListValue";
@@ -860,7 +860,7 @@ class DetailParserMetadataIdfISO
         $hvd = [];
         $searchTerms = [];
 
-        $keywordsPath = './gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords';
+        $keywordsPath = './gmd:identificationInfo/*/gmd:descriptiveKeywords/gmd:MD_Keywords[./*]';
         $keywordsNodes = IdfHelper::getNodeList($node, $keywordsPath);
         foreach ($keywordsNodes as $keywordsNode) {
             $thesaurusName = IdfHelper::getNodeValue($keywordsNode, './gmd:thesaurusName/gmd:CI_Citation/gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]');
@@ -946,7 +946,7 @@ class DetailParserMetadataIdfISO
     private static function getVectors(\SimpleXMLElement $node, string $lang): array
     {
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:spatialRepresentationInfo/gmd:MD_VectorSpatialRepresentation") ?? [];
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:spatialRepresentationInfo/gmd:MD_VectorSpatialRepresentation[./*]") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
             $item[] = array(
@@ -971,7 +971,7 @@ class DetailParserMetadataIdfISO
     private static function getSymbolCatalogues(\SimpleXMLElement $node): array
     {
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:portrayalCatalogueInfo/gmd:MD_PortrayalCatalogueReference/gmd:portrayalCatalogueCitation/gmd:CI_Citation") ?? [];
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:portrayalCatalogueInfo/gmd:MD_PortrayalCatalogueReference/gmd:portrayalCatalogueCitation/gmd:CI_Citation[./*]") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
 
@@ -998,7 +998,7 @@ class DetailParserMetadataIdfISO
     private static function getFeatureCatalogues(\SimpleXMLElement $node): array
     {
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:contentInfo/gmd:MD_FeatureCatalogueDescription/gmd:featureCatalogueCitation/gmd:CI_Citation") ?? [];
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:contentInfo/gmd:MD_FeatureCatalogueDescription/gmd:featureCatalogueCitation/gmd:CI_Citation[./*]") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
 
@@ -1053,7 +1053,7 @@ class DetailParserMetadataIdfISO
     private static function getOperations(\SimpleXMLElement $node): array
     {
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata") ?? [];
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata[./*]") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
 
@@ -1133,7 +1133,7 @@ class DetailParserMetadataIdfISO
     private static function getDataFormats(\SimpleXMLElement $node): array
     {
         $array = [];
-        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:distributionInfo/gmd:MD_Distribution/gmd:distributionFormat/gmd:MD_Format") ?? [];
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:distributionInfo/gmd:MD_Distribution/gmd:distributionFormat/gmd:MD_Format[./*]") ?? [];
         foreach ($tmpNodes as $tmpNode) {
             $item = [];
             $name = IdfHelper::getNodeValue($tmpNode, "./gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
@@ -1301,7 +1301,7 @@ class DetailParserMetadataIdfISO
                $value = CapabilitiesHelper::getMapUrl($value, null, null, self::getIdentifier($node, $type));
             }
             if (!isset($value)) {
-                $crossRefNodes = IdfHelper::getNodeList($node, './idf:crossReference');
+                $crossRefNodes = IdfHelper::getNodeList($node, './idf:crossReference[./*]');
                 foreach ($crossRefNodes as $crossRefNode) {
                     $mapUrl =  IdfHelper::getNodeValue($crossRefNode, "./idf:mapUrl");
                     if (isset($mapUrl)) {
@@ -1317,7 +1317,7 @@ class DetailParserMetadataIdfISO
                 }
             }
             if (!isset($value)) {
-                $transOptionNodes = IdfHelper::getNodeList($node, './gmd:distributionInfo/*/gmd:transferOptions');
+                $transOptionNodes = IdfHelper::getNodeList($node, './gmd:distributionInfo/*/gmd:transferOptions[./*]');
                 foreach ($transOptionNodes as $transOptionNode) {
                     $url = IdfHelper::getNodeValue($transOptionNode, './gmd:MD_DigitalTransferOptions/gmd:onLine/*/gmd:linkage/gmd:URL');
                     if (isset($url)) {
@@ -1352,7 +1352,7 @@ class DetailParserMetadataIdfISO
             if ($crossReference) {
                 $origId = IdfHelper::getNodeValue($crossReference, "./@orig-uuid");
                 $uuid = IdfHelper::getNodeValue($crossReference, "./@uuid");
-                $xpathExpression = "./gmd:identificationInfo/*/srv:operatesOn";
+                $xpathExpression = "./gmd:identificationInfo/*/srv:operatesOn[./*]";
                 $nodeList = IdfHelper::getNodeList($node, $xpathExpression);
                 foreach ($nodeList as $tmpNode) {
                     $uuidRef = IdfHelper::getNodeValue($tmpNode, "./@uuidref");
@@ -1376,12 +1376,12 @@ class DetailParserMetadataIdfISO
     private static function getAdditionalFields(\SimpleXMLElement $node, DetailMetadataISO $metadata, string $lang): void
     {
         $array = [];
-        $xpathExpression = './idf:additionalDataSection';
+        $xpathExpression = './idf:additionalDataSection[./*]';
         $additionalDataSections = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($additionalDataSections as $additionalDataSection) {
             $sectionTitle = IdfHelper::getNodeValue($additionalDataSection, './idf:title[@lang="'. $lang . '"]');
             $items = [];
-            $additionalDataFields = IdfHelper::getNodeList($additionalDataSection, './idf:additionalDataField');
+            $additionalDataFields = IdfHelper::getNodeList($additionalDataSection, './idf:additionalDataField[./*]');
             foreach ($additionalDataFields as $additionalDataField) {
                 $fieldTitle = IdfHelper::getNodeValue($additionalDataField, './idf:title[@lang="'. $lang . '"]');
                 $fieldData = IdfHelper::getNodeValue($additionalDataField, './idf:data');

@@ -57,7 +57,7 @@ class DetailParserAddressIdfISO
                 $role = IdfHelper::getNodeValue($roleNode, "./@codeListValue");
             }
             $addresses = [];
-            $tmpAddresses = IdfHelper::getNodeList($tmpNode, "./idf:hierarchyParty");
+            $tmpAddresses = IdfHelper::getNodeList($tmpNode, "./idf:hierarchyParty[./*]");
 
             foreach ($tmpAddresses as $tmpAddress) {
                 $uuid = IdfHelper::getNodeValue($tmpAddress, "./@uuid");
@@ -134,7 +134,7 @@ class DetailParserAddressIdfISO
     public static function getLinks(\SimpleXMLElement $node, string $lang): array
     {
         $array = [];
-        $nodes = IdfHelper::getNodeList($node, 'idf:objectReference');
+        $nodes = IdfHelper::getNodeList($node, 'idf:objectReference[./*]');
         foreach ($nodes as $tmpNode) {
             $uuid = IdfHelper::getNodeValue($tmpNode, "./@uuid");
             $type = IdfHelper::getNodeValue($tmpNode, "./idf:objectType");
@@ -160,7 +160,7 @@ class DetailParserAddressIdfISO
             );
             $array[] = $item;
         }
-        $nodes = IdfHelper::getNodeList($node, 'idf:subordinatedParty');
+        $nodes = IdfHelper::getNodeList($node, 'idf:subordinatedParty[./*]');
         foreach ($nodes as $tmpNode) {
             $uuid = IdfHelper::getNodeValue($tmpNode, "./@uuid");
             $type = IdfHelper::getNodeValue($tmpNode, "./idf:addressType");
@@ -174,7 +174,7 @@ class DetailParserAddressIdfISO
             $array[] = $item;
         }
 
-        $nodes = IdfHelper::getNodeList($node, 'idf:superiorParty');
+        $nodes = IdfHelper::getNodeList($node, 'idf:superiorParty[./*]');
         foreach ($nodes as $tmpNode) {
             $uuid = IdfHelper::getNodeValue($tmpNode, "./@uuid");
             $type = IdfHelper::getNodeValue($tmpNode, "./idf:addressType");
