@@ -102,16 +102,19 @@ class LanguageHelper
         306 => "Low Saxon",
     ];
 
-    public static function getNameFromIso639_2(string $isoCode, string $lang): string
+    public static function getNameFromIso639_2(?string $isoCode, string $lang): string
     {
-        $name = $isoCode;
-        if (array_key_exists($isoCode, self::$languageISO639_2ToIGCCode)) {
-            $igeCode = self::$languageISO639_2ToIGCCode[$isoCode];
-            if ($igeCode) {
-                if ($lang == 'en') {
-                    $name = self::$languageCodelist_en[$igeCode];
-                } else {
-                    $name = self::$languageCodelist_de[$igeCode];
+        $name = null;
+        if (isset($isoCode)) {
+            $name = $isoCode;
+            if (array_key_exists($isoCode, self::$languageISO639_2ToIGCCode)) {
+                $igeCode = self::$languageISO639_2ToIGCCode[$isoCode];
+                if ($igeCode) {
+                    if ($lang == 'en') {
+                        $name = self::$languageCodelist_en[$igeCode];
+                    } else {
+                        $name = self::$languageCodelist_de[$igeCode];
+                    }
                 }
             }
         }
