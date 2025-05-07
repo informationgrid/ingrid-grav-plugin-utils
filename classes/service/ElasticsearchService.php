@@ -262,6 +262,21 @@ class ElasticsearchService
         });
     }
 
+    public static function findDependedFacetById($facetConfig, string $facetParent, int|string $facetId): array
+    {
+        return array_filter($facetConfig, function ($facet) use ($facetParent, $facetId) {
+            $found = false;
+            if (isset($facet['display_depend_on'])) {
+                if ($facetId) {
+                    $found = isset($facet['display_depend_on'][$facetParent]) and $facet['display_depend_on'][$facetParent] === $facetId;
+                } else {
+                    $found = isset($facet['display_depend_on'][$facetParent]);
+                }
+            }
+            return $found;
+        });
+    }
+
     public static function addFilterToFacet(array &$filter, array $facetConfig, array $selectedFacets, string $facetId): void
     {
         foreach ($selectedFacets as $selectedFacetId => $selectedFacetValues) {
@@ -280,6 +295,18 @@ class ElasticsearchService
                             foreach ($splits as $split) {
                                 $shouldGroup[] = json_decode($split, true);
                             }
+                        }
+                    }
+                } elseif ($selectedFacetId === 'timeref') {
+                    $selectedFacet = self::findByFacetId($facetConfig, $selectedFacetId);
+
+                    // Get the first matched object
+                    $foundObject = reset($selectedFacet);
+
+                    if (isset($foundObject['filter'])) {
+                        $facetFilter = sprintf($foundObject['filter'], ...explode(",", $selectedFacetValues));
+                        if (str_starts_with($facetFilter, '{')) {
+                            $shouldGroup[] = json_decode($facetFilter, true);
                         }
                     }
                 } else {
