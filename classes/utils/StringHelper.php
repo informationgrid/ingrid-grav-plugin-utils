@@ -8,7 +8,7 @@ class StringHelper
     public static function convertUrlInText(string $text): string
     {
         $replaceText = "";
-        $regex = "/((((ftp|https?):\/\/)|(w{3}.))[A-zÀ-ž0-9-_@:%+.~#?,&\\/=]+)[^ ,.)!\n\r\t\"]/";
+        $regex = "/((((ftp|https?):\/\/)|(w{3}.))[A-zÀ-ž0-9-_@:%+.~#?,&\\/=]+)[^ ,.)!<\\\n\r\t\"]/";
         preg_match_all($regex, $text, $matches, PREG_OFFSET_CAPTURE);
         $replaceUrl = "";
         $startIndex = 0;
