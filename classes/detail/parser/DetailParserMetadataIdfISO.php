@@ -1053,7 +1053,7 @@ class DetailParserMetadataIdfISO
     {
         $array = [];
 
-        $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage/gmd:source/gmd:LI_Source[./gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]]";
+        $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage/gmd:source/gmd:LI_Source[./gmd:description and not(./gmd:sourceCitation)]";
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($tmpNodes as $tmpNode) {
             $description = IdfHelper::getNodeValue($tmpNode, "./gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
@@ -1067,6 +1067,25 @@ class DetailParserMetadataIdfISO
                 "date" => $date,
                 "dateType" => $dateType ? CodelistHelper::getCodelistEntryByLocalisation('502', $dateType, $lang) : null,
                 "url" => $identifier
+            );
+        }
+
+        $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage/gmd:source/gmd:LI_Source[./gmd:description and ./gmd:sourceCitation]";
+        $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
+        foreach ($tmpNodes as $tmpNode) {
+            $description = IdfHelper::getNodeValue($tmpNode, "./gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $title = IdfHelper::getNodeValue($tmpNode, "./gmd:sourceCitation/gmd:CI_Citation/gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]");;
+            $date = IdfHelper::getNodeValue($tmpNode, "./gmd:sourceCitation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/*[self::gco:Date or self::gco:DateTime]");
+            $dateType = IdfHelper::getNodeValue($tmpNode, "./gmd:sourceCitation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode");
+            $identifier = IdfHelper::getNodeValue($tmpNode, "./gmd:sourceCitation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $uuid = IdfHelper::getNodeValue($tmpNode, "./gmd:sourceCitation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/idf:uuid");
+            $array[] = array(
+                "title" => $title,
+                "description" => $description,
+                "date" => $date,
+                "dateType" => $dateType ? CodelistHelper::getCodelistEntryByLocalisation('502', $dateType, $lang) : null,
+                "url" => $identifier,
+                "uuid" => $uuid
             );
         }
 
