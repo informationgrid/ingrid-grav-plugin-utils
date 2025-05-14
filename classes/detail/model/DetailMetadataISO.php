@@ -127,6 +127,9 @@ class DetailMetadataISO
     public ?string $metadataStandardVersion;
     public ?string $metadataCharacterSet;
     public ?array $hierarchyLevelNames;
+    public ?array $citations;
+    public ?array $bibliographies;
+    public ?array $doi;
 
     public function __construct(string $uuid)
     {
