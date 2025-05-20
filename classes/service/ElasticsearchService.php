@@ -6,6 +6,7 @@ use stdClass;
 
 class ElasticsearchService
 {
+    static string $FILTER_SEPARATOR = ';';
 
     static function convertToQuery(
         string $query,
@@ -191,7 +192,7 @@ class ElasticsearchService
     public static function getFilter(mixed $foundObject, mixed $selectionValue, array $result, array $filter): array
     {
         if (property_exists((object)$foundObject, 'search')) {
-            $explodedSelection = explode(",", $selectionValue);
+            $explodedSelection = explode(self::$FILTER_SEPARATOR, $selectionValue);
             $tempFilter = array();
             if (count($explodedSelection) > 1) {
                 foreach ($explodedSelection as $item) {
@@ -202,7 +203,7 @@ class ElasticsearchService
                 $filter[] = '{ "query_string": { "query":"' . sprintf($foundObject['search'], $explodedSelection[0]) . '"}}';
             }
         } else if (property_exists((object)$foundObject, 'facets')) {
-            $values = explode(",", $selectionValue);
+            $values = explode(self::$FILTER_SEPARATOR, $selectionValue);
             $facets = $foundObject['facets'];
             $tempFilter = array();
             $isToggle = isset($foundObject['toggle']['active']) && $foundObject['toggle']['active'];
@@ -240,7 +241,7 @@ class ElasticsearchService
             // we need to combine facets within a group by OR
             $filter[] = '{"bool": { "should": [ ' . join(",", $tempFilter) . ']}}';
         } else if (property_exists((object)$foundObject, 'filter')) {
-            $filter[] = sprintf($foundObject['filter'], ...explode(",", $selectionValue));
+            $filter[] = sprintf($foundObject['filter'], ...explode(self::$FILTER_SEPARATOR, $selectionValue));
         }
         return array($result, $filter);
     }
@@ -289,7 +290,7 @@ class ElasticsearchService
                     $foundObject = reset($selectedFacet);
 
                     if (isset($foundObject['filter'])) {
-                        $facetFilter = sprintf($foundObject['filter'], ...explode(",", $selectedFacetValues));
+                        $facetFilter = sprintf($foundObject['filter'], ...explode(self::$FILTER_SEPARATOR, $selectedFacetValues));
                         if (str_starts_with($facetFilter, '{')) {
                             $splits = explode(",", $facetFilter);
                             foreach ($splits as $split) {
@@ -304,13 +305,13 @@ class ElasticsearchService
                     $foundObject = reset($selectedFacet);
 
                     if (isset($foundObject['filter'])) {
-                        $facetFilter = sprintf($foundObject['filter'], ...explode(",", $selectedFacetValues));
+                        $facetFilter = sprintf($foundObject['filter'], ...explode(self::$FILTER_SEPARATOR, $selectedFacetValues));
                         if (str_starts_with($facetFilter, '{')) {
                             $shouldGroup[] = json_decode($facetFilter, true);
                         }
                     }
                 } else {
-                    $values = explode(",", $selectedFacetValues);
+                    $values = explode(self::$FILTER_SEPARATOR, $selectedFacetValues);
                     foreach ($values as $value) {
                         $selectedFacet = self::findByFacetId($facetConfig, $selectedFacetId);
 
