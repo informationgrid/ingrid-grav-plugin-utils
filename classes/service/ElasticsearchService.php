@@ -6,7 +6,9 @@ use stdClass;
 
 class ElasticsearchService
 {
-    static string $FILTER_SEPARATOR = ';';
+    static string $FACET_ENTRIES_SEPARATOR = ';';
+    static string $FACET_ENTRY_VALUE_SEPARATOR = ',';
+    static string $FILTER_QUERY_SEPARATOR = ',';
 
     static function convertToQuery(
         string $query,
@@ -130,7 +132,7 @@ class ElasticsearchService
         if (count($filter) === 0) {
             $finalFilter = '{"match_all": {}}';
         } else {
-            $finalFilter = '{"bool": { "must": [ ' . join(",", $filter) . ']}}';
+            $finalFilter = '{"bool": { "must": [ ' . join(self::$FILTER_QUERY_SEPARATOR, $filter) . ']}}';
         }
 
 
@@ -192,18 +194,18 @@ class ElasticsearchService
     public static function getFilter(mixed $foundObject, mixed $selectionValue, array $result, array $filter): array
     {
         if (property_exists((object)$foundObject, 'search')) {
-            $explodedSelection = explode(self::$FILTER_SEPARATOR, $selectionValue);
+            $explodedSelection = explode(self::$FACET_ENTRIES_SEPARATOR, $selectionValue);
             $tempFilter = array();
             if (count($explodedSelection) > 1) {
                 foreach ($explodedSelection as $item) {
                     $tempFilter[] = '{ "query_string": { "query":"' . sprintf($foundObject['search'], $item) . '"}}';
                 }
-                $filter[] = '{"bool": { "should": [ ' . join(",", $tempFilter) . ']}}';
+                $filter[] = '{"bool": { "should": [ ' . join(self::$FILTER_QUERY_SEPARATOR, $tempFilter) . ']}}';
             } else {
                 $filter[] = '{ "query_string": { "query":"' . sprintf($foundObject['search'], $explodedSelection[0]) . '"}}';
             }
         } else if (property_exists((object)$foundObject, 'facets')) {
-            $values = explode(self::$FILTER_SEPARATOR, $selectionValue);
+            $values = explode(self::$FACET_ENTRIES_SEPARATOR, $selectionValue);
             $facets = $foundObject['facets'];
             $tempFilter = array();
             $isToggle = isset($foundObject['toggle']['active']) && $foundObject['toggle']['active'];
@@ -239,9 +241,9 @@ class ElasticsearchService
                 }
             }
             // we need to combine facets within a group by OR
-            $filter[] = '{"bool": { "should": [ ' . join(",", $tempFilter) . ']}}';
+            $filter[] = '{"bool": { "should": [ ' . join(self::$FILTER_QUERY_SEPARATOR, $tempFilter) . ']}}';
         } else if (property_exists((object)$foundObject, 'filter')) {
-            $filter[] = sprintf($foundObject['filter'], ...explode(self::$FILTER_SEPARATOR, $selectionValue));
+            $filter[] = sprintf($foundObject['filter'], ...explode(self::$FACET_ENTRY_VALUE_SEPARATOR, $selectionValue));
         }
         return array($result, $filter);
     }
@@ -290,9 +292,9 @@ class ElasticsearchService
                     $foundObject = reset($selectedFacet);
 
                     if (isset($foundObject['filter'])) {
-                        $facetFilter = sprintf($foundObject['filter'], ...explode(self::$FILTER_SEPARATOR, $selectedFacetValues));
+                        $facetFilter = sprintf($foundObject['filter'], ...explode(self::$FACET_ENTRY_VALUE_SEPARATOR, $selectedFacetValues));
                         if (str_starts_with($facetFilter, '{')) {
-                            $splits = explode(",", $facetFilter);
+                            $splits = explode(self::$FILTER_QUERY_SEPARATOR, $facetFilter);
                             foreach ($splits as $split) {
                                 $shouldGroup[] = json_decode($split, true);
                             }
@@ -305,13 +307,13 @@ class ElasticsearchService
                     $foundObject = reset($selectedFacet);
 
                     if (isset($foundObject['filter'])) {
-                        $facetFilter = sprintf($foundObject['filter'], ...explode(self::$FILTER_SEPARATOR, $selectedFacetValues));
+                        $facetFilter = sprintf($foundObject['filter'], ...explode(self::$FACET_ENTRY_VALUE_SEPARATOR, $selectedFacetValues));
                         if (str_starts_with($facetFilter, '{')) {
                             $shouldGroup[] = json_decode($facetFilter, true);
                         }
                     }
                 } else {
-                    $values = explode(self::$FILTER_SEPARATOR, $selectedFacetValues);
+                    $values = explode(self::$FACET_ENTRIES_SEPARATOR, $selectedFacetValues);
                     foreach ($values as $value) {
                         $selectedFacet = self::findByFacetId($facetConfig, $selectedFacetId);
 
