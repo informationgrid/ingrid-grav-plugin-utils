@@ -130,8 +130,6 @@ class DetailMetadataISO
     public ?array $citations;
     public ?array $bibliographies;
     public ?array $doi;
-    public ?string $bawAggregateDataSetNameNumber;
-    public ?string $bawAggregateDataSetNameTitle;
     public ?array $measurementMethod;
     public ?string $measurementSpatialOrientation;
     public ?string $measurementMinDischarge;
