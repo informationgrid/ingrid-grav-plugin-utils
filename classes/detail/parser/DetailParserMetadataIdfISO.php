@@ -126,9 +126,9 @@ class DetailParserMetadataIdfISO
         $metadata->timePublication = IdfHelper::getNodeValue($node, $xpathExpression);
         $xpathExpression = "./*/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'revision']/gmd:date/*[self::gco:Date or self::gco:DateTime]";
         $metadata->timeRevision = IdfHelper::getNodeValue($node, $xpathExpression);
-        $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_AccuracyOfATimeMeasurement/gmd:result/gmd:DQ_QuantitativeResul/gmd:value/gco:Record";
+        $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_AccuracyOfATimeMeasurement/gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record";
         $metadata->timeMeasureValue = IdfHelper::getNodeValue($node, $xpathExpression);
-        $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_AccuracyOfATimeMeasurement/gmd:result/gmd:DQ_QuantitativeResul/gmd:valueUnit/gml:UnitDefinition/gml:catalogSymbol";
+        $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_AccuracyOfATimeMeasurement/gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/gml:UnitDefinition/gml:catalogSymbol";
         $metadata->timeMeasureUnit = IdfHelper::getNodeValue($node, $xpathExpression);
     }
 
@@ -850,6 +850,44 @@ class DetailParserMetadataIdfISO
         $metadata->media = self::getMedias($node, $lang);
         $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributionOrderProcess/gmd:MD_StandardOrderProcess/gmd:orderingInstructions/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->orderInstructions = IdfHelper::getNodeValue($node, $xpathExpression);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasurementMethod/measurementMethod";
+        $metadata->measurementMethod = IdfHelper::getNodeValueList($node, $xpathExpression);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/spatialOrientation";
+        $metadata->measurementSpatialOrientation = IdfHelper::getNodeValue($node, $xpathExpression);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/minDischarge";
+        $metadata->measurementMinDischarge = IdfHelper::getNodeValue($node, $xpathExpression);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/maxDischarge";
+        $metadata->measurementMaxDischarge = IdfHelper::getNodeValue($node, $xpathExpression);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/measurementFrequency";
+        $metadata->measurementMeasurementFrequency = IdfHelper::getNodeValue($node, $xpathExpression);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/dataQualityDescription";
+        $metadata->measurementDataQualityDescription = IdfHelper::getNodeValue($node, $xpathExpression);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasurementDepth[./*]";
+        $xpathExpressionSub = ["./depth", "./uom", "./verticalCRS"];
+        $metadata->measurementMeasurementDepth = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeanWaterLevel[./*]";
+        $xpathExpressionSub = ["./waterLevel", "./uom"];
+        $metadata->measurementMeanWaterLevel = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/GaugeDatum[./*]";
+        $xpathExpressionSub = ["./datum", "./uom", "./verticalCRS", "./description"];
+        $metadata->measurementGaugeDatum = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasurementDevice[./*]";
+        $xpathExpressionSub = ["./name", "./id", "./model", "./description"];
+        $metadata->measurementMeasurementDevice = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasuredQuantities[./*]";
+        $xpathExpressionSub = ["./name", "./type", "./uom", "./calculationFormula"];
+        $metadata->measurementMeasuredQuantities = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
     }
 
     private static function getKeywords(\SimpleXMLElement $node, DetailMetadataISO &$metadata, string $lang): void

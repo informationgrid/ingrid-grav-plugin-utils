@@ -93,6 +93,27 @@ class IdfHelper
         return $array;
     }
 
+    public static function getNodeValueListWithSubEntries(\SimpleXMLElement $node, string $xpath, array $xpathSubs, array $subTypes = null, array $codelist = null, ?string $lang = null): array
+    {
+        self::registerNamespaces($node);
+        $array = array();
+        $tmpNodes = self::getNodeList($node, $xpath);
+        foreach ($tmpNodes as $tmpNode) {
+            if ($tmpNode) {
+                $item = [];
+                foreach ($xpathSubs as $key => $xpathSub) {
+                    $item[] = array(
+                        "value" => self::getNodeValue($tmpNode, $xpathSub, $codelist[$key] ?? null, $lang),
+                        "type" => $subTypes[$key] ?? 'text'
+                    );
+                }
+                if (!empty($item)) {
+                    $array[] = $item;
+                }
+            }
+        }
+        return $array;
+    }
     public static function getNodeValueListCodelistCompare($node, string $xpath, ?array $codelist, ?string $lang, bool $addEqual = true): array
     {
         self::registerNamespaces($node);
