@@ -796,8 +796,7 @@ class DetailParserMetadataIdfISO
         $xpathExpression = "./gmd:identificationInfo/*/gmd:resourceFormat/gmd:MD_Format/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->literaturTyp = IdfHelper::getNodeValue($node, $xpathExpression);
 
-        $xpathExpression = "./gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage/gmd:source/gmd:LI_Source/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]";
-        $metadata->literaturBase = IdfHelper::getNodeValue($node, $xpathExpression);
+        $metadata->literaturBases = $metadata->sourceDescriptions;
 
         $xpathExpression = "./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:otherCitationDetails/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->literaturDocInfo = IdfHelper::getNodeValue($node, $xpathExpression);

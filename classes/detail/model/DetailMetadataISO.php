@@ -78,7 +78,7 @@ class DetailMetadataISO
     public ?string $literaturSide;
     public ?string $literaturIsbn;
     public ?string $literaturTyp;
-    public ?string $literaturBase;
+    public ?array $literaturBases;
     public ?string $literaturDocInfo;
     public ?string $literaturDescription;
     public ?string $projectLeader;
