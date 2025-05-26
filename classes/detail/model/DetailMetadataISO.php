@@ -35,8 +35,9 @@ class DetailMetadataISO
     public ?string $timeMeasureUnit;
     public ?array $regionKey;
     public ?string $locDescr;
-    public bool|string $polygonWkt;
-    public bool|string $polygonGeojson;
+    public bool|array $polygonWkts;
+    public bool|array $polygonGeojsons;
+    public ?array $bwastrs;
     public ?array $bboxes;
     public ?array $geographicElement;
     public ?array $areaHeight;

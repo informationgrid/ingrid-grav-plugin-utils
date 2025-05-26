@@ -122,18 +122,18 @@ class ElasticsearchHelper
     public static function getBBoxes(\stdClass $esHit, ?string $title): array
     {
         $array = array();
-        $x1s = ElasticsearchHelper::toArray(ElasticsearchHelper::getValue($esHit, "x1"));
-        $y1s = ElasticsearchHelper::toArray(ElasticsearchHelper::getValue($esHit, "y1"));
-        $x2s = ElasticsearchHelper::toArray(ElasticsearchHelper::getValue($esHit, "x2"));
-        $y2s = ElasticsearchHelper::toArray(ElasticsearchHelper::getValue($esHit, "y2"));
+        $x1s = ElasticsearchHelper::getValueArray($esHit, "x1");
+        $y1s = ElasticsearchHelper::getValueArray($esHit, "y1");
+        $x2s = ElasticsearchHelper::getValueArray($esHit, "x2");
+        $y2s = ElasticsearchHelper::getValueArray($esHit, "y2");
 
         if (!empty($x1s) && !empty($x2s) && !empty($y1s) && !empty($y2s)) {
-            $locations = ElasticsearchHelper::toArray(ElasticsearchHelper::getValue($esHit, "location"));
+            $locations = ElasticsearchHelper::getValueArray($esHit, "location");
             $count = 0;
             foreach ($x1s as $x1) {
                 if ($x1) {
                     $array[] = [
-                        "title" => !empty($locations[$count]) ?: $title,
+                        "title" => $locations[$count] ?? $title,
                         "westBoundLongitude" => (float)$x1s[$count],
                         "southBoundLatitude" => (float)$y1s[$count],
                         "eastBoundLongitude" => (float)$x2s[$count],

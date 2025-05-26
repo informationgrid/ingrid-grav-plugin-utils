@@ -144,12 +144,19 @@ class DetailParserMetadataIdfISO
         }
         $metadata->regionKey = $regionKey;
         $metadata->locDescr = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
-        $polygon = IdfHelper::getNode($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_BoundingPolygon/gmd:polygon/*");
-        if (isset($polygon)) {
-            $metadata->polygonWkt = IdfHelper::transformGML($polygon, 'wkt');
-            $metadata->polygonGeojson = IdfHelper::transformGML($polygon, 'geojson');
+        $polygons = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_BoundingPolygon/gmd:polygon/*");
+        $polygonWkts = [];
+        $polygonGeojsons = [];
+        foreach ($polygons as $polygon) {
+            if (isset($polygon)) {
+                $polygonWkts[] = IdfHelper::transformGML($polygon, 'wkt');
+                $polygonGeojsons[] = IdfHelper::transformGML($polygon, 'geojson');
+            }
         }
+        $metadata->polygonWkts = $polygonWkts;
+        $metadata->polygonGeojsons = $polygonGeojsons;
         $metadata->bboxes = self::getBBoxes($node, $metadata->title);
+        $metadata->bwastrs = self::getBwaStrs($node);
         $metadata->geographicElement = self::getGeographicElements($node, $lang);
         $metadata->areaHeight = self::getAreaHeight($node, $lang);
         $metadata->referenceSystemId = self::getReferences($node);
@@ -216,6 +223,34 @@ class DetailParserMetadataIdfISO
                 "eastBoundLongitude" => (float)IdfHelper::getNodeValue($tmpNode, "./gmd:eastBoundLongitude/gco:Decimal"),
                 "northBoundLatitude" => (float)IdfHelper::getNodeValue($tmpNode, "./gmd:northBoundLatitude/gco:Decimal")
             );
+        }
+        return $array;
+    }
+
+    private static function getBwaStrs(\SimpleXMLElement $node): array
+    {
+        $array = [];
+        $tmpNodes = IdfHelper::getNodeValueList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
+        foreach ($tmpNodes as $tmpNode) {
+            $values = preg_replace('/[^-?0-9.0-9]+/', '', $tmpNode);
+            $values = str_replace('-', ' ', $values);
+            $values = explode(' ', $values);
+            if (!empty(reset($values))) {
+                $id = $values[0];
+                $from = $values[1] ?? '';
+                $to = $values[2] ?? '';
+
+                if (str_ends_with($id, '00')) {
+                    $id = substr($id, 0, -2);
+                    $id = $id . '01';
+                }
+
+                $array[] = array(
+                    "id" => $id,
+                    "from" => $from,
+                    "to" => $to
+                );
+            }
         }
         return $array;
     }
@@ -1458,7 +1493,7 @@ class DetailParserMetadataIdfISO
     private static function getAdditionalFields(\SimpleXMLElement $node, DetailMetadataISO $metadata, string $lang): void
     {
         $array = [];
-        $xpathExpression = './idf:additionalDataSection[./*]';
+        $xpathExpression = './idf:additionalDataSection[@id="additionalFields"]';
         $additionalDataSections = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($additionalDataSections as $additionalDataSection) {
             $sectionTitle = IdfHelper::getNodeValue($additionalDataSection, './idf:title[@lang="'. $lang . '"]');
