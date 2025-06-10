@@ -31,7 +31,7 @@ class ElasticsearchService
         $aggs = ElasticsearchService::mapFacets($facet_config, $selectedFacets);
         $queryFromFacets = ElasticsearchService::getQueryFromFacets($facet_config, $selectedFacets);
 
-        if ($query == "" && $queryFromFacets->query == "") {
+        if (empty(trim($query)) && empty(trim($queryFromFacets->query))) {
             $result = array("match_all" => new stdClass());
         } else {
             $result = array("query_string" => array(
@@ -88,14 +88,9 @@ class ElasticsearchService
                     "aggs" => array(
                         "global_filter" => array(
                             "filter" => array(
-                                "bool" => array(
-                                    "must" => array(
-                                        "query_string" => array(
-                                            "query" => $query,
-                                            "fields" => $queryFields,
-                                            "default_operator" => $queryStringOperator
-                                        )
-                                    )
+                                "bool" => array("must" => empty(trim($query)) ?
+                                    array("match_all" => new stdClass()) :
+                                    array("query_string" => array("query" => $query))
                                 )
                             ),
                             "aggs" => $aggs
