@@ -52,6 +52,147 @@ class DetailParserMetadataIdfISO
             in_array(strtolower('opendataident'), array_map('strtolower', $metadata->searchTerms));
         $metadata->isHVD = count($metadata->hvd) > 0;
         $metadata->hierarchyLevelNames = IdfHelper::getNodeValueList($node, "./gmd:hierarchyLevelName/*[self::gco:CharacterString or self::gmx:Anchor or .]");
+
+// Profile additional entries
+        $metadata->sourceCodeRights= self::getBoolInfoValue($node, './gmd:identificationInfo/*/software/QuellCodeRechte[./baw/gco:Boolean]', './baw/gco:Boolean', './anmerkungen');
+        $metadata->useRights = self::getBoolInfoValue($node, './gmd:identificationInfo/*/software/NutzungsRechte[./dritte/gco:Boolean]', './dritte/gco:Boolean', 'anmerkungen');
+        $metadata->doi = self::getDoi($node);
+        $metadata->citations = self::getCitations($node);
+        $metadata->bibliographies = self::getBibliographies($node);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasurementMethod/measurementMethod";
+        $metadata->measurementMethod = IdfHelper::getNodeValueList($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/spatialOrientation";
+        $metadata->measurementSpatialOrientation = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/minDischarge";
+        $metadata->measurementMinDischarge = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/maxDischarge";
+        $metadata->measurementMaxDischarge = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/measurementFrequency";
+        $metadata->measurementMeasurementFrequency = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/dataQualityDescription";
+        $metadata->measurementDataQualityDescription = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasurementDepth[./*]";
+        $xpathExpressionSub = ["./depth", "./uom", "./verticalCRS"];
+        $metadata->measurementMeasurementDepth = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeanWaterLevel[./*]";
+        $xpathExpressionSub = ["./waterLevel", "./uom"];
+        $metadata->measurementMeanWaterLevel = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/GaugeDatum[./*]";
+        $xpathExpressionSub = ["./datum", "./uom", "./verticalCRS", "./description"];
+        $metadata->measurementGaugeDatum = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasurementDevice[./*]";
+        $xpathExpressionSub = ["./name", "./id", "./model", "./description"];
+        $metadata->measurementMeasurementDevice = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasuredQuantities[./*]";
+        $xpathExpressionSub = ["./name", "./type", "./uom", "./calculationFormula"];
+        $metadata->measurementMeasuredQuantities = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+
+        $metadata->dataFormat = 'TTTT';
+        $xpathExpression = './gmd:identificationInfo//gmd:descriptiveKeywords[.//gmd:thesaurusName//gmd:title//*[self::gco:CharacterString or self::gmx:Anchor] = "de.baw.codelist.model.method"]//gmd:keyword/*[self::gco:CharacterString or self::gmx:Anchor]';
+        $metadata->procedure = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = './gmd:identificationInfo//gmd:descriptiveKeywords[.//gmd:thesaurusName//gmd:title//*[self::gco:CharacterString or self::gmx:Anchor] = "de.baw.codelist.model.type"]//gmd:keyword/*[self::gco:CharacterString or self::gmx:Anchor]';
+        $metadata->modelTypes = IdfHelper::getNodeValueList($node, $xpathExpression);
+        $xpathExpression = './gmd:identificationInfo//gmd:descriptiveKeywords[.//gmd:thesaurusName//gmd:title//*[self::gco:CharacterString or self::gmx:Anchor] = "de.baw.codelist.model.dimensionality"]//gmd:keyword/*[self::gco:CharacterString or self::gmx:Anchor]';
+        $metadata->spatialDimensionality = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = './gmd:dataQualityInfo//gmd:DQ_AccuracyOfATimeMeasurement//gco:Record';
+        $metadata->timestepSize = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "//gmd:DQ_DataQuality[./gmd:report/gmd:DQ_QuantitativeAttributeAccuracy]";
+        $xpathExpressionSub = [
+            "./gmd:lineage//gmd:LI_Source/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]",
+            ".//gmd:DQ_QuantitativeAttributeAccuracy//gmd:valueType/gco:RecordType",
+            ".//gmd:DQ_QuantitativeAttributeAccuracy//gmd:valueUnit//gml:catalogSymbol",
+            ".//gmd:DQ_QuantitativeAttributeAccuracy//gmd:value/gco:Record"
+        ];
+        $metadata->dataQualities = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
+        $xpathExpression = './gmd:identificationInfo/*/software/einsatzzweck';
+        $metadata->einsatzzweck = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = './gmd:identificationInfo/*/software/ErgaenzungsModul/ergaenzungsModul/gco:Boolean';
+        $metadata->ergaenzungsModul = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = './gmd:identificationInfo/*/software/ErgaenzungsModul/ergaenzteSoftware';
+        $metadata->ergaenzteSoftware = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = './gmd:identificationInfo/*/software/Programmiersprache/programmiersprache';
+        $metadata->programmiersprache = IdfHelper::getNodeValueList($node, $xpathExpression);
+        $xpathExpression = './gmd:identificationInfo/*/software/Entwicklungsumgebung/entwicklungsumgebung';
+        $metadata->entwicklungsumgebung = IdfHelper::getNodeValueList($node, $xpathExpression);
+        $xpathExpression = './gmd:identificationInfo/*/software/Bibliotheken';
+        $metadata->bibliotheken = IdfHelper::getNodeValueList($node, $xpathExpression);
+        $xpathExpression = './gmd:identificationInfo/*/software/installationsMethode';
+        $metadata->installationsMethode = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = './gmd:identificationInfo/*/software/Nutzerkreis';
+        $metadata->nutzerkreis = self::getTableSymbolInfo(
+            $node,
+            $xpathExpression,
+            ["", "./baw/gco:Boolean", "./wsv/gco:Boolean", "./extern/gco:Boolean"],
+            [1, 2, 3],
+            './anmerkungen'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/ProduktiverEinsatz';
+        $metadata->produktiverEinsatz = self::getTableSymbolInfo(
+            $node,
+            $xpathExpression,
+            ["", "./wsvAuftrag/gco:Boolean", "./fUndE/gco:Boolean", "./andere/gco:Boolean"],
+            [1, 2, 3],
+            './anmerkungen'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Betriebssystem';
+        $metadata->betriebssystem = self::getTableSymbolInfo(
+            $node,
+            $xpathExpression,
+            ["", "./windows/gco:Boolean", "./linux/gco:Boolean"],
+            [1, 2],
+            './anmerkungen'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Erstellungsvertrag/vertragsNummer';
+        $metadata->erstellungsvertragsnummer = array(
+            'value' => IdfHelper::getNodeValue($node, $xpathExpression),
+            'type' => 'text'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Erstellungsvertrag/datum';
+        $metadata->erstellungsvertragsdatum = array(
+            'value' => IdfHelper::getNodeValue($node, $xpathExpression),
+            'type' => 'date'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Supportvertrag/vertragsNummer';
+        $metadata->supportvertragsnummer = array(
+            'value' => IdfHelper::getNodeValue($node, $xpathExpression),
+            'type' => 'text'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Supportvertrag/datum';
+        $metadata->supportvertragsdatum = array(
+            'value' => IdfHelper::getNodeValue($node, $xpathExpression),
+            'type' => 'date'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Supportvertrag/anmerkungen';
+        $metadata->supportvertragsinfo = array(
+            'value' => IdfHelper::getNodeValueList($node, $xpathExpression),
+            'type' => 'text'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Installationsort/lokal/gco:Boolean';
+        $metadata->installationsortlokal = array(
+            'value' => IdfHelper::getNodeValue($node, $xpathExpression),
+            'type' => 'bool'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Installationsort/HLR/hlr/gco:Boolean';
+        $metadata->installationsorthlr = array(
+            'value' => IdfHelper::getNodeValue($node, $xpathExpression),
+            'type' => 'bool'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Installationsort/HLR/hlrName';
+        $metadata->installationsorthlrName = array(
+            'value' => IdfHelper::getNodeValue($node, $xpathExpression),
+            'type' => 'text'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Installationsort/Server/server/gco:Boolean';
+        $metadata->installationsortserver = array(
+            'value' => IdfHelper::getNodeValue($node, $xpathExpression),
+            'type' => 'bool'
+        );
+        $xpathExpression = './gmd:identificationInfo/*/software/Installationsort/Server/servername/text';
+        $metadata->installationsortservername = array(
+            'values' => IdfHelper::getNodeValueList($node, $xpathExpression),
+            'type' => 'text'
+        );
+
         return $metadata;
     }
 
@@ -546,11 +687,30 @@ class DetailParserMetadataIdfISO
         return Utils::sortArrayByKey($array, "title", SORT_ASC);
     }
 
-    private static function getUseRefs(\SimpleXMLElement$node, DetailMetadataISO &$metadata, string $lang): void
+    private static function getUseRefs(\SimpleXMLElement $node, DetailMetadataISO &$metadata, string $lang): void
     {
         $metadata->useConstraints = self::getUseConstraints($node, $lang);
         $metadata->accessConstraints = self::getAccessConstraints($node);
         $metadata->useLimitations = self::getUseLimitations($node);
+    }
+
+    private static function getBoolInfoValue(\SimpleXMLElement $node, string $xpathExpression, string $xpathSubExpressionBool, string $xpathSubExpressionInfo): ?array
+    {
+        $xpathExpression = "./gmd:identificationInfo/*/software/QuellCodeRechte[./baw/gco:Boolean]";
+        $tmpNode = IdfHelper::getNode($node, $xpathExpression);
+        if ($tmpNode) {
+            return array(
+                array (
+                    "value" => IdfHelper::getNodeValue($tmpNode, "./baw/gco:Boolean"),
+                    "type" => "bool"
+                ),
+                array (
+                    "values" => IdfHelper::getNodeValueList($tmpNode, "./anmerkungen"),
+                    "type" => "text"
+                )
+            );
+        }
+        return null;
     }
 
     private static function getUseConstraints(\SimpleXMLElement $node, string $lang): array
@@ -881,44 +1041,6 @@ class DetailParserMetadataIdfISO
         $metadata->media = self::getMedias($node, $lang);
         $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:distributor/gmd:MD_Distributor/gmd:distributionOrderProcess/gmd:MD_StandardOrderProcess/gmd:orderingInstructions/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->orderInstructions = IdfHelper::getNodeValue($node, $xpathExpression);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasurementMethod/measurementMethod";
-        $metadata->measurementMethod = IdfHelper::getNodeValueList($node, $xpathExpression);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/spatialOrientation";
-        $metadata->measurementSpatialOrientation = IdfHelper::getNodeValue($node, $xpathExpression);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/minDischarge";
-        $metadata->measurementMinDischarge = IdfHelper::getNodeValue($node, $xpathExpression);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/maxDischarge";
-        $metadata->measurementMaxDischarge = IdfHelper::getNodeValue($node, $xpathExpression);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/measurementFrequency";
-        $metadata->measurementMeasurementFrequency = IdfHelper::getNodeValue($node, $xpathExpression);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/dataQualityDescription";
-        $metadata->measurementDataQualityDescription = IdfHelper::getNodeValue($node, $xpathExpression);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasurementDepth[./*]";
-        $xpathExpressionSub = ["./depth", "./uom", "./verticalCRS"];
-        $metadata->measurementMeasurementDepth = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeanWaterLevel[./*]";
-        $xpathExpressionSub = ["./waterLevel", "./uom"];
-        $metadata->measurementMeanWaterLevel = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/GaugeDatum[./*]";
-        $xpathExpressionSub = ["./datum", "./uom", "./verticalCRS", "./description"];
-        $metadata->measurementGaugeDatum = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasurementDevice[./*]";
-        $xpathExpressionSub = ["./name", "./id", "./model", "./description"];
-        $metadata->measurementMeasurementDevice = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
-
-        $xpathExpression = "./gmd:identificationInfo/*/measurementInfo/MeasuredQuantities[./*]";
-        $xpathExpressionSub = ["./name", "./type", "./uom", "./calculationFormula"];
-        $metadata->measurementMeasuredQuantities = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
     }
 
     private static function getKeywords(\SimpleXMLElement $node, DetailMetadataISO &$metadata, string $lang): void
@@ -1568,6 +1690,30 @@ class DetailParserMetadataIdfISO
             );
         }
         return null;
+    }
+
+    private static function getTableSymbolInfo(\SimpleXMLElement $node, string $xpathExpression, array $xpathSubExpressions, array $symbolCols, string $xpathSubEpressionInfo): ?array
+    {
+        $rows = [];
+        $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
+        foreach ($tmpNodes as $tmpNode) {
+            $row = [];
+            foreach ($xpathSubExpressions as $key => $xpathSubExpression) {
+                if ($xpathSubExpression) {
+                    $row[] = array(
+                            "value" => IdfHelper::getNodeValue($tmpNode, $xpathSubExpression),
+                            "type" => in_array($key, $symbolCols) ? "symbol" : "text"
+                    );
+                } else {
+                    $row[] = "";
+                }
+            }
+            $rows[] = $row;
+        }
+        return array(
+            "rows" => $rows,
+            "infos" => IdfHelper::getNodeValueList($node, $xpathExpression . '/' . $xpathSubEpressionInfo)
+        );
     }
 
 }

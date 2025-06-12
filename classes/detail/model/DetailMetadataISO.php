@@ -2,7 +2,9 @@
 
 namespace Grav\Plugin;
 
-class DetailMetadataISO
+use AllowDynamicProperties;
+
+#[AllowDynamicProperties] class DetailMetadataISO
 {
 
     public string $uuid;
@@ -128,20 +130,6 @@ class DetailMetadataISO
     public ?string $metadataStandardVersion;
     public ?string $metadataCharacterSet;
     public ?array $hierarchyLevelNames;
-    public ?array $citations;
-    public ?array $bibliographies;
-    public ?array $doi;
-    public ?array $measurementMethod;
-    public ?string $measurementSpatialOrientation;
-    public ?string $measurementMinDischarge;
-    public ?string $measurementMaxDischarge;
-    public ?string $measurementMeasurementFrequency;
-    public ?string $measurementDataQualityDescription;
-    public ?array $measurementMeasurementDepth;
-    public ?array $measurementMeanWaterLevel;
-    public ?array $measurementGaugeDatum;
-    public ?array $measurementMeasurementDevice;
-    public ?array $measurementMeasuredQuantities;
 
     public function __construct(string $uuid)
     {
