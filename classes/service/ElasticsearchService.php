@@ -90,7 +90,11 @@ class ElasticsearchService
                             "filter" => array(
                                 "bool" => array("must" => empty(trim($query)) ?
                                     array("match_all" => new stdClass()) :
-                                    array("query_string" => array("query" => $query))
+                                    array("query_string" => array(
+                                        "query" => $query,
+                                        "fields" => $queryFields,
+                                        "default_operator" => $queryStringOperator
+                                    ))
                                 )
                             ),
                             "aggs" => $aggs
