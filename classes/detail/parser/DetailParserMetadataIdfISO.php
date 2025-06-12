@@ -45,9 +45,6 @@ class DetailParserMetadataIdfISO
         self::getDataQualityRefs($node, $metadata);
         self::getAdditionalFields($node, $metadata, $lang);
         self::getMetaInfoRefs($node, $uuid, $dataSourceName, $providers, $metadata, $lang);
-        $metadata->citations = self::getCitations($node);
-        $metadata->bibliographies = self::getBibliographies($node);
-        $metadata->doi = self::getDoi($node);
 
         $metadata->isInspire = in_array(strtolower('inspire'), array_map('strtolower', $metadata->searchTerms)) ||
             in_array(strtolower('inspireidentifiziert'), array_map('strtolower', $metadata->searchTerms));

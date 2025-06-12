@@ -99,7 +99,7 @@ class IdfHelper
         $array = array();
         $tmpNodes = self::getNodeList($node, $xpath);
         foreach ($tmpNodes as $tmpNode) {
-            if ($tmpNode) {
+            if (isset($tmpNode)) {
                 $item = [];
                 foreach ($xpathSubs as $key => $xpathSub) {
                     $item[] = array(
