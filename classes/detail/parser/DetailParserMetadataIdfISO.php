@@ -87,7 +87,12 @@ class DetailParserMetadataIdfISO
         $xpathExpressionSub = ["./name", "./type", "./uom", "./calculationFormula"];
         $metadata->measurementMeasuredQuantities = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);
 
-        $metadata->dataFormat = 'TTTT';
+        $xpathExpression = "//gmd:resourceFormat/gmd:MD_Format";
+        $xpathExpressionSub = [
+            "./gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]",
+            "./gmd:version/*[self::gco:CharacterString or self::gmx:Anchor]"
+        ];
+        $metadata->dataFormat = IdfHelper::getNodeValueListWithSubEntries($node, $xpathExpression, $xpathExpressionSub);;
         $xpathExpression = './gmd:identificationInfo//gmd:descriptiveKeywords[.//gmd:thesaurusName//gmd:title//*[self::gco:CharacterString or self::gmx:Anchor] = "de.baw.codelist.model.method"]//gmd:keyword/*[self::gco:CharacterString or self::gmx:Anchor]';
         $metadata->procedure = IdfHelper::getNodeValue($node, $xpathExpression);
         $xpathExpression = './gmd:identificationInfo//gmd:descriptiveKeywords[.//gmd:thesaurusName//gmd:title//*[self::gco:CharacterString or self::gmx:Anchor] = "de.baw.codelist.model.type"]//gmd:keyword/*[self::gco:CharacterString or self::gmx:Anchor]';

@@ -102,10 +102,19 @@ class IdfHelper
             if (isset($tmpNode)) {
                 $item = [];
                 foreach ($xpathSubs as $key => $xpathSub) {
-                    $item[] = array(
-                        "value" => self::getNodeValue($tmpNode, $xpathSub, $codelist[$key] ?? null, $lang),
-                        "type" => $subTypes[$key] ?? 'text'
-                    );
+                    $values = self::getNodeValueList($tmpNode, $xpathSub, $codelist[$key] ?? null, $lang);
+                    if (count($values) > 1) {
+                        $item[] = array(
+                            "values" => $values,
+                            "type" => $subTypes[$key] ?? 'text'
+                        );
+                    } else {
+                        $item[] = array(
+                            "value" => $values[0],
+                            "type" => $subTypes[$key] ?? 'text'
+                        );
+                    }
+
                 }
                 if (!empty($item)) {
                     $array[] = $item;
