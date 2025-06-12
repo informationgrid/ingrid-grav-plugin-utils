@@ -377,7 +377,7 @@ class DetailParserMetadataIdfISO
         foreach ($tmpNodes as $tmpNode) {
             $values = preg_replace('/[^-?0-9.0-9]+/', '', $tmpNode);
             $values = str_replace('-', ' ', $values);
-            $values = explode(' ', $values);
+            $values = explode(' ', trim($values));
             if (!empty(reset($values))) {
                 $id = $values[0];
                 $from = $values[1] ?? '';
