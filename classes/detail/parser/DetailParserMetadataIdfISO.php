@@ -604,8 +604,8 @@ class DetailParserMetadataIdfISO
             $description = IdfHelper::getNodeValue($tmpNode, "./idf:description");
             $type = IdfHelper::getNodeValue($tmpNode, "./idf:objectType");
             $previews = IdfHelper::getNodeValueList($tmpNode, "./idf:graphicOverview");
-            $extMapUrl = IdfHelper::getNodeList($tmpNode, "./idf:extMapUrl[./*]");
-            $mapUrl = IdfHelper::getNodeList($tmpNode, "./idf:mapUrl[./*]");
+            $extMapUrl = IdfHelper::getNodeValueList($tmpNode, "./idf:extMapUrl");
+            $mapUrl = IdfHelper::getNodeValueList($tmpNode, "./idf:mapUrl");
             $item = array (
                 "uuid" => $uuid,
                 "title" => $title,
@@ -628,9 +628,9 @@ class DetailParserMetadataIdfISO
             $title = IdfHelper::getNodeValue($tmpNode, "./idf:objectName");
             $description = IdfHelper::getNodeValue($tmpNode, "./idf:description");
             $type = IdfHelper::getNodeValue($tmpNode, "./idf:objectType");
-            $previews = IdfHelper::getNodeList($tmpNode, "./idf:graphicOverview[./*]");
-            $extMapUrl = IdfHelper::getNodeList($tmpNode, "./idf:extMapUrl[./*]");
-            $mapUrl = IdfHelper::getNodeList($tmpNode, "./idf:mapUrl[./*]");
+            $previews = IdfHelper::getNodeValueList($tmpNode, "./idf:graphicOverview");
+            $extMapUrl = IdfHelper::getNodeValueList($tmpNode, "./idf:extMapUrl");
+            $mapUrl = IdfHelper::getNodeValueList($tmpNode, "./idf:mapUrl");
             $item = array (
                 "uuid" => $uuid,
                 "title" => $title,
