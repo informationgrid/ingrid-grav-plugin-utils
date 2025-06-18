@@ -94,7 +94,8 @@ class ElasticsearchService
                                         "query" => $query,
                                         "fields" => $queryFields,
                                         "default_operator" => $queryStringOperator
-                                    ))
+                                    )),
+                                    "filter" => $filter
                                 )
                             ),
                             "aggs" => $aggs
