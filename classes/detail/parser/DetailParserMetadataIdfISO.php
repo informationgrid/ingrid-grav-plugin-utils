@@ -198,6 +198,15 @@ class DetailParserMetadataIdfISO
             'type' => 'text'
         );
 
+        $xpathExpression = './gmd:dataSetURI/gco:CharacterString';
+        $metadata->geodatenLink = IdfHelper::getNodeValue($node, $xpathExpression);
+
+        $xpathExpression = './gmd:identificationInfo/gmd:MD_DataIdentification/gmd:supplementalInformation/gco:CharacterString';
+        $metadata->internalNotes = IdfHelper::getNodeValue($node, $xpathExpression);
+
+        $xpathExpression = './idf:treePath/gco:CharacterString';
+        $metadata->folderNames = IdfHelper::getNodeValueList($node, $xpathExpression);
+
         return $metadata;
     }
 
