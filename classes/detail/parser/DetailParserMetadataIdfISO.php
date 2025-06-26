@@ -1269,12 +1269,14 @@ class DetailParserMetadataIdfISO
             $date = IdfHelper::getNodeValue($tmpNode, "./gmd:sourceCitation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/*[self::gco:Date or self::gco:DateTime]");
             $dateType = IdfHelper::getNodeValue($tmpNode, "./gmd:sourceCitation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode");
             $identifier = IdfHelper::getNodeValue($tmpNode, "./gmd:sourceCitation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $uuid = IdfHelper::getNodeValue($tmpNode, "./gmd:sourceCitation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/idf:uuid");
             $array[] = array(
                 "title" => $title,
                 "description" => $description,
                 "date" => $date,
                 "dateType" => $dateType ? CodelistHelper::getCodelistEntryByLocalisation('502', $dateType, $lang) : null,
-                "url" => $identifier
+                "url" => $identifier,
+                "uuid" => $uuid
             );
         }
 
