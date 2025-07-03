@@ -729,17 +729,23 @@ class DetailParserMetadataIdfISO
 
     private static function getUseConstraints(\SimpleXMLElement $node, string $lang): array
     {
+        $config = Grav::instance()['config'];
+        $theme = $config->get('system.pages.theme');
+        $displayUseConstraintsJson = $config->get('themes.' . $theme . '.hit_detail.display_use_constraints_json') ?? true;
+
         $array = [];
         $constraints = [];
         $restriction = null;
 
         $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints[./gmd:useConstraints]/*");
-        foreach ($nodes as $tmpNode) {
-            $restriction = IdfHelper::getNodeValue($tmpNode, "./gmd:MD_RestrictionCode[not(contains(@codeListValue, 'otherRestrictions'))]", ["524"], $lang);
+        if ($displayUseConstraintsJson) {
+            foreach ($nodes as $tmpNode) {
+                $restriction = IdfHelper::getNodeValue($tmpNode, "./gmd:MD_RestrictionCode[not(contains(@codeListValue, 'otherRestrictions'))]", ["524"], $lang);
 
-            $values = IdfHelper::getNodeValueList($tmpNode, "./*[self::gco:CharacterString or self::gmx:Anchor][starts-with(text(),'{')]");
-            foreach ($values as $value) {
-                $constraints[] = self::removeConstraintPrefix($value);
+                $values = IdfHelper::getNodeValueList($tmpNode, "./*[self::gco:CharacterString or self::gmx:Anchor][starts-with(text(),'{')]");
+                foreach ($values as $value) {
+                    $constraints[] = self::removeConstraintPrefix($value);
+                }
             }
         }
         foreach ($nodes as $tmpNode) {
