@@ -700,7 +700,7 @@ class DetailParserMetadataIdfISO
         }
 
         // Verordnung
-        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[./*/idf:attachedToField[@entry-id='5302']]";
+        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[./*/idf:attachedToField[@entry-id='9980']]";
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($tmpNodes as $tmpNode) {
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
@@ -718,7 +718,7 @@ class DetailParserMetadataIdfISO
         }
 
         // Weitere Verweise ohne Verordnung
-        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='5302']) and not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/gmd:function/*/@codeListValue='download')][./*]";
+        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='9980']) and not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/gmd:function/*/@codeListValue='download')][./*]";
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($tmpNodes as $tmpNode) {
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
