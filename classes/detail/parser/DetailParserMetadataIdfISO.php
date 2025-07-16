@@ -698,6 +698,49 @@ class DetailParserMetadataIdfISO
                 $array[] = $item;
             }
         }
+
+        // Verordnung
+        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[./*/idf:attachedToField[@entry-id='5302']]";
+        $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
+        foreach ($tmpNodes as $tmpNode) {
+            $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
+            $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField");
+            $item = array (
+                "url" => $url,
+                "title" => $title,
+                "description" => $description,
+                "attachedToField" => $attachedToField,
+                "kind" => "regulation",
+            );
+            $array[] = $item;
+        }
+
+        // Weitere Verweise ohne Verordnung
+        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='5302']) and not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/gmd:function/*/@codeListValue='download')][./*]";
+        $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
+        foreach ($tmpNodes as $tmpNode) {
+            $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
+            $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField");
+            if (!isset($attachedToField)) {
+                $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue", ["2000"], $lang);
+            }
+            $applicationProfile = IdfHelper::getNodeValue($tmpNode, "./*/gmd:applicationProfile/*[self::gco:CharacterString or self::gmx:Anchor]");
+            $size = IdfHelper::getNodeValue($tmpNode, "./../gmd:transferSize/gco:Real");
+            $item = array (
+                "url" => $url,
+                "title" => $title ?? $url,
+                "description" => $description,
+                "attachedToField" => $attachedToField,
+                "applicationProfile" => $applicationProfile,
+                "linkInfo" => $size ? "[" . $size . "MB]" : null,
+                "kind" => "other_exclude_regulation",
+            );
+            $array[] = $item;
+        }
         return Utils::sortArrayByKey($array, "title", SORT_ASC);
     }
 
