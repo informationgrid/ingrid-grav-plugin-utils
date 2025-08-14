@@ -741,7 +741,13 @@ class DetailParserMetadataIdfISO
             );
             $array[] = $item;
         }
-        return Utils::sortArrayByKey($array, "title", SORT_ASC);
+        $config = Grav::instance()['config'];
+        $theme = $config->get('system.pages.theme');
+        $sortLinksASC = $config->get('themes.' . $theme . '.hit_detail.link_sort_asc') ?? true;
+        if ($sortLinksASC) {
+            return Utils::sortArrayByKey($array, "title", SORT_ASC);
+        }
+        return $array;
     }
 
     private static function getUseRefs(\SimpleXMLElement $node, DetailMetadataISO &$metadata, string $lang): void
