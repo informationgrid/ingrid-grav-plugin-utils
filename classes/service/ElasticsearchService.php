@@ -22,7 +22,6 @@ class ElasticsearchService
         string $queryStringOperator,
         array  $requestedFields = [],
         array  $sourceSettings = [],
-        array  $addToSort = [],
     ): string
     {
         if (count($addToSearch) > 0) {
@@ -51,9 +50,6 @@ class ElasticsearchService
                     "order" => "desc"
                 )
             );
-        }
-        if (count($addToSort) > 0) {
-            $sortQuery[] = $addToSort;
         }
 
         $source = [];
@@ -102,7 +98,7 @@ class ElasticsearchService
                     )
                 )
             ),
-            "sort" => $sortQuery ?? [],
+            "sort" => $sortQuery,
         ));
     }
 
