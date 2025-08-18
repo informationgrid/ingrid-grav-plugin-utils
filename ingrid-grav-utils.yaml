@@ -1,4 +1,5 @@
 enabled: true
+debug: false
 codelist_api:
   url: 'https://dev.informationgrid.eu/codelist-repo/rest/getCodelists'
   user: ingrid

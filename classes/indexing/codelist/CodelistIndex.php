@@ -12,9 +12,13 @@ class CodelistIndex
 
     public static function indexJob(string $api, string $user, string $pass): array
     {
-        $log = Grav::instance()['log'];
+        $grav = Grav::instance();
+        $log = $grav['log'];
+        $isDebug = $grav['config']->get('plugins.ingrid-grav-utils.debug');
         $lang = Grav::instance()['language'];
-        $log->debug('Start job: Codelist Synchronisation');
+        if ($isDebug) {
+            $log->debug('Start job: Codelist Synchronisation');
+        }
         $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_UNSUCCESS']);
         $status = false;
 
@@ -54,7 +58,9 @@ class CodelistIndex
             }
         }
 
-        $log->debug('Finished job: Codelist Synchronisation');
+        if ($isDebug) {
+            $log->debug('Finished job: Codelist Synchronisation');
+        }
         return [$status, $msg];
     }
 

@@ -13,8 +13,12 @@ class RssIndex
 
     public static function indexJob(array $feeds): void
     {
-        $log = Grav::instance()['log'];
-        $log->debug('Start job: RSS Indexing');
+        $grav = Grav::instance();
+        $log = $grav['log'];
+        $isDebug = $grav['config']->get('plugins.ingrid-grav-utils.debug');
+        if ($isDebug) {
+            $log->debug('Start job: RSS Indexing');
+        }
         $array = array();
         foreach($feeds as $feed) {
             self::getRssFeedItems($feed, $array, $log);
@@ -22,7 +26,7 @@ class RssIndex
         $names = array();
         #iterating over the arr
         foreach ($array as $key => $val) {
-        #storing the key of the names array as the Name key of the arr
+            #storing the key of the names array as the Name key of the arr
             $names[$key] = $val['date_ms'];
 
         }
@@ -35,7 +39,9 @@ class RssIndex
             "data" => $array
         );
         self::writeJsonFile(json_encode($result, JSON_PRETTY_PRINT), "user-data://feeds", "feeds.json");
-        $log->debug('Finished job: RSS Indexing');
+        if ($isDebug) {
+            $log->debug('Finished job: RSS Indexing');
+            }
     }
 
     private static function getRssFeedItems(array $feed, array &$array): void

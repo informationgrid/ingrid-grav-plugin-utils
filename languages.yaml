@@ -1,5 +1,8 @@
 en:
   PLUGIN_INGRID_GRAV_UTILS:
+    DEBUG:
+      TITLE: Debug
+      HELP: Debug-Meldungen werden im grav.log ausgegeben.
     CODELIST_API:
       TITLE: Codelist-API indexing
       URL: URL
@@ -46,6 +49,9 @@ en:
       GRAV_MENU_TEXT: Reindexing RSS
 de:
   PLUGIN_INGRID_GRAV_UTILS:
+    DEBUG:
+      TITLE: Debug
+      HELP: Debug-Meldungen werden im grav.log ausgegeben.
     CODELIST_API:
       TITLE: Codelist-API - Indexierung
       URL: URL
