@@ -205,7 +205,7 @@ class DetailParserMetadataIdfISO
         $metadata->internalNotes = IdfHelper::getNodeValue($node, $xpathExpression);
 
         $xpathExpression = './idf:treePath/gco:CharacterString';
-        $metadata->folderNames = IdfHelper::getNodeValueList($node, $xpathExpression);
+        $metadata->folderNames = IdfHelper::getNodeValue($node, $xpathExpression);
 
         return $metadata;
     }
