@@ -22,9 +22,7 @@ class MimeTypeHelper
         if (empty($extension)) {
             if (str_starts_with($url, "http://") || str_starts_with($url, "https://")) {
                 try {
-                    $opts['http']['timeout'] = 3;
-                    $context = stream_context_create( $opts );
-                    $headers = get_headers($url, true, $context);
+                    $headers = get_headers($url, true);
                     $hasStatusOk = false;
 
                     foreach ($headers as $key => $head) {
