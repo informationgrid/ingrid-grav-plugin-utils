@@ -104,6 +104,8 @@ class ElasticsearchHelper
                                 } else {
                                     $tmpSource = $tmpSource->$tmpKey;
                                 }
+                            } else {
+                                break;
                             }
                         }
                     }
