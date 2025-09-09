@@ -238,6 +238,6 @@ class MimeTypeHelper
             "application/atom+xml" => "atom",
             "application/opensearchdescription+xml" => "opensearch"
         ];
-        return $mime_map[$mime] ?? false;
+        return $mime ? $mime_map[$mime] : false;
     }
 }
