@@ -55,6 +55,19 @@ class IdfHelper
         return null;
     }
 
+    public static function getNodeBoolValue(\SimpleXMLElement $node, string $xpath): bool
+    {
+        self::registerNamespaces($node);
+        $tmpNode = $node->xpath($xpath);
+        if ($tmpNode) {
+            $value = (string) $tmpNode[0];
+            if ($value === 'true') {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static function getNodeList(\SimpleXMLElement $node, string $xpath): array
     {
         self::registerNamespaces($node);

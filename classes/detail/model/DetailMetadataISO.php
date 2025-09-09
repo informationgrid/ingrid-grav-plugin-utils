@@ -14,7 +14,7 @@ use AllowDynamicProperties;
     public ?string $title;
     public ?array $altTitle;
     public ?string $summary;
-    public ?string $hasAccessConstraint;
+    public ?bool $hasAccessConstraint;
     public bool $isInspire;
     public bool $isOpendata;
     public bool $isHVD;

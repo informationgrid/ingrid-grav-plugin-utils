@@ -30,7 +30,7 @@ class DetailParserMetadataIdfISO
         }
 
         $xpathExpression = "./idf:hasAccessConstraint";
-        $metadata->hasAccessConstraint = IdfHelper::getNodeValue($node, $xpathExpression);
+        $metadata->hasAccessConstraint = IdfHelper::getNodeBoolValue($node, $xpathExpression);
 
         $metadata->previews = self::getPreviews($node);
         $metadata->mapUrl = IdfHelper::getNodeValue($node, './idf:mapUrl') ?? self::getMapUrl($node, $metadata->metaClass);
