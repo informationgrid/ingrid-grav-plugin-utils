@@ -84,4 +84,15 @@ class StringHelper
             return round($bytes / $gigabyte, $precision) . ' GB';
         }
     }
+
+    public static function convertFilename(string $text): string
+    {
+        $maxLength = 250;
+        $text = preg_replace("/[\/:*?\"<>|]/i", '_', $text);
+        if (strlen($text) > 250) {
+            $text = substr($text, 0, $maxLength - count($text));
+        }
+        return $text;
+    }
+
 }
