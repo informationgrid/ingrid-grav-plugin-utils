@@ -87,10 +87,10 @@ class StringHelper
 
     public static function convertFilename(string $text): string
     {
-        $maxLength = 250;
+        $maxLength = 200;
         $text = preg_replace("/[\/:*?\"<>|]/i", '_', $text);
-        if (strlen($text) > 250) {
-            $text = substr($text, 0, $maxLength - count($text));
+        if (strlen($text) >= $maxLength) {
+            $text = substr($text, 0, $maxLength - strlen($text));
         }
         return $text;
     }
