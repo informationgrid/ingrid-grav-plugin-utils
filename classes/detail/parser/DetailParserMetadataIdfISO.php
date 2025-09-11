@@ -654,11 +654,11 @@ class DetailParserMetadataIdfISO
             $array[] = $item;
         }
 
-        // URL des Zuganges
+        // URL des Zugangs
         if ($objType == 3) {
             $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata[./srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor][contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), 'getcap')]]/srv:connectPoint[./*]";
             $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
-            if (!empty($tmpNodes)) {
+            if (empty($tmpNodes)) {
                 $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint[./*]";
                 $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
             }
@@ -1640,7 +1640,7 @@ class DetailParserMetadataIdfISO
             }
         } else if ($type == '3') {
             $value = IdfHelper::getNodeValue($node, './idf:mapUrl');
-            if (isset($value)) {
+            if (!isset($value)) {
                 $serviceUrl = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor][text() = 'GetCapabilities']/../../srv:connectPoint//gmd:URL");
                 $serviceType = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceType/*");
                 $serviceVersion = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceTypeVersion/*");
