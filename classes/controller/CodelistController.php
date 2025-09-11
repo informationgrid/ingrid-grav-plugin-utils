@@ -23,17 +23,18 @@ class CodelistController
         $msg = $this->grav['language']->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_EMPTY']);
         try {
             if (file_exists($path)) {
-                $response = file_get_contents($path);
-                $json = json_decode($response, true);
-                if (isset($json['status'])) {
-                    $jsonStatus = $json['status'];
-                    if (isset($jsonStatus['error'])) {
-                        $msg = $this->grav['language']->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_FAILED', $jsonStatus['error']]);
-                        $msg .= ' ' . $this->grav['language']->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_SUCCESS', count($json['data']), $jsonStatus['time']]);
-                        $status = false;
-                    } else {
-                        $msg = $this->grav['language']->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_SUCCESS', count($json['data']), $jsonStatus['time']]);
-                        $status = true;
+                if (($response = HttpHelper::getFileContent($path)) !== false) {
+                    $json = json_decode($response, true);
+                    if (isset($json['status'])) {
+                        $jsonStatus = $json['status'];
+                        if (isset($jsonStatus['error'])) {
+                            $msg = $this->grav['language']->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_FAILED', $jsonStatus['error']]);
+                            $msg .= ' ' . $this->grav['language']->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_SUCCESS', count($json['data']), $jsonStatus['time']]);
+                            $status = false;
+                        } else {
+                            $msg = $this->grav['language']->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_SUCCESS', count($json['data']), $jsonStatus['time']]);
+                            $status = true;
+                        }
                     }
                 }
             }

@@ -26,10 +26,11 @@ class RssController
         $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.RSS.INDEXING_RSS_EMPTY']);
         try {
             if(file_exists($path)) {
-                $response = file_get_contents($path);
-                $json = json_decode($response, true);
-                $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.RSS.INDEXING_RSS_SUCCESS', count($json["data"]), $json["status"]["time"]]);
-                $status = true;
+                if (($response = HttpHelper::getFileContent($path)) !== false) {
+                    $json = json_decode($response, true);
+                    $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.RSS.INDEXING_RSS_SUCCESS', count($json["data"]), $json["status"]["time"]]);
+                    $status = true;
+                }
             }
         } catch (\Exception $e) {
         }

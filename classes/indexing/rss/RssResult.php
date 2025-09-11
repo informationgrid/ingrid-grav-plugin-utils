@@ -12,11 +12,14 @@ class RssResult
     {
         $response = null;
         try {
-            $response = file_get_contents('user-data://feeds/feeds.json');
+            $response = HttpHelper::getFileContent('user-data://feeds/feeds.json');
         } catch (\Throwable $th) {
         }
-        $result = json_decode($response, true);
-        return $result['data'] ?? [];
+        if ($response) {
+            $result = json_decode($response, true);
+            return $result['data'] ?? [];
+        }
+        return [];
     }
 
 }

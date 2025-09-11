@@ -3,6 +3,8 @@
 namespace Grav\Plugin;
 
 
+use Grav\Common\Grav;
+
 class MimeTypeHelper
 {
     public static function getUrlMimetype(string $url): string
@@ -55,7 +57,7 @@ class MimeTypeHelper
                         }
                     }
                 } catch(\Exception $e) {
-                    throw new \Exception($e);
+                    Grav::instance()['log']->error('Error get mime type for ' . $url . ': ' . $e->getMessage());
                 }
             }
         }

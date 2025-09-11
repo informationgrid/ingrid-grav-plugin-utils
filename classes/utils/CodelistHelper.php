@@ -275,8 +275,9 @@ class CodelistHelper
     private static function getCodelist(string $codelistId): ?\SimpleXMLElement
     {
         try {
-            $response = file_get_contents('user-data://codelists/codelist_' . $codelistId . '.xml');
-            return simplexml_load_string($response);
+            if (($response = HttpHelper::getFileContent('user-data://codelists/codelist_' . $codelistId . '.xml')) !== false){
+                return simplexml_load_string($response);
+                }
         } catch (\Throwable $th) {
         }
         return null;

@@ -29,35 +29,36 @@ class CodelistIndex
             ]
         ];
         $context = stream_context_create($opts);
-        $response = file_get_contents($api, false, $context);
-        $codelists = json_decode($response, true);
-        $time = date("d.m.Y H:i", time());
-        if ($codelists) {
-            foreach($codelists as $codelist) {
-                $id = $codelist["id"];
-                self::writeXmlFile($codelist, "user-data://codelists", "codelist_" . $id . ".xml");
-            }
-            $result = array(
-                "status" => array(
-                    "time" => $time,
-                    "count" => count($codelists)
-                ),
-                "data" => $codelists
-            );
-            self::writeJsonFile(json_encode($result, JSON_PRETTY_PRINT), "user-data://codelists", "codelists.json");
-            $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_SUCCESS', count($codelists), $time]);
-            $status = true;
-        } else {
-            $log->warn('Codelists could not be synchronized');
-            $path = 'user-data://codelists/codelists.json';
-            if(file_exists($path)) {
-                $response = file_get_contents($path);
-                $result = json_decode($response, true);
-                $result["status"]["error"] = $time;
+        if (($response = file_get_contents($api, false, $context)) !== false) {
+            $codelists = json_decode($response, true);
+            $time = date("d.m.Y H:i", time());
+            if ($codelists) {
+                foreach ($codelists as $codelist) {
+                    $id = $codelist["id"];
+                    self::writeXmlFile($codelist, "user-data://codelists", "codelist_" . $id . ".xml");
+                }
+                $result = array(
+                    "status" => array(
+                        "time" => $time,
+                        "count" => count($codelists)
+                    ),
+                    "data" => $codelists
+                );
                 self::writeJsonFile(json_encode($result, JSON_PRETTY_PRINT), "user-data://codelists", "codelists.json");
+                $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_SUCCESS', count($codelists), $time]);
+                $status = true;
+            } else {
+                $log->warn('Codelists could not be synchronized');
+                $path = 'user-data://codelists/codelists.json';
+                if (file_exists($path)) {
+                    if (($response = HttpHelper::getFileContent($path)) !== false) {
+                        $result = json_decode($response, true);
+                        $result["status"]["error"] = $time;
+                        self::writeJsonFile(json_encode($result, JSON_PRETTY_PRINT), "user-data://codelists", "codelists.json");
+                    }
+                }
             }
         }
-
         if ($isDebug) {
             $log->debug('Finished job: Codelist Synchronisation');
         }

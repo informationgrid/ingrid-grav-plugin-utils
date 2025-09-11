@@ -54,8 +54,7 @@ class RssIndex
         $category = $feed["category"];
 
         try {
-            $response = file_get_contents($url);
-            if ($response) {
+            if (($response = HttpHelper::getFileContent($url)) !== false) {
                 $content = simplexml_load_string($response);
                 $itemNodes = $content->xpath("//item");
                 foreach ($itemNodes as $itemNode) {
