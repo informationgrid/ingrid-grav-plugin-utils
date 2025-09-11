@@ -52,13 +52,14 @@ class IngridGravUtilsPlugin extends Plugin
 
         // Set proxy
         $systemProxy = $this->grav['config']->get('system.http.proxy');
-        $streamContext =  array(
-            'http' => array(
-                'timeout' => 30,
-                'proxy' => $systemProxy ? 'http://' . $systemProxy : '',
-            )
-        );
-        stream_context_set_default($streamContext);
+        if ($systemProxy) {
+            $streamContext = array(
+                'http' => array(
+                    'proxy' => 'http://' . $systemProxy,
+                )
+            );
+            stream_context_set_default($streamContext);
+        }
 
         // Don't proceed if we are in the admin plugin
         if ($this->isAdmin()) {

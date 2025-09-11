@@ -22,33 +22,35 @@ class MimeTypeHelper
         if (empty($extension)) {
             if (str_starts_with($url, "http://") || str_starts_with($url, "https://")) {
                 try {
-                    $headers = get_headers($url, true);
-                    $hasStatusOk = false;
+                    $headers = HttpHelper::getHeader($url);
+                    if ($headers) {
+                        $hasStatusOk = false;
 
-                    foreach ($headers as $key => $head) {
-                        if (is_numeric($key)) {
-                            if (str_contains($head, " 20")) {
-                                $hasStatusOk = true;
-                                break;
+                        foreach ($headers as $key => $head) {
+                            if (is_numeric($key)) {
+                                if (str_contains($head, " 20")) {
+                                    $hasStatusOk = true;
+                                    break;
+                                }
                             }
                         }
-                    }
 
-                    if ($hasStatusOk) {
-                        $headerContentType = $headers["Content-Type"];
-                        if (!empty($headerContentType)) {
-                            if (is_array($headerContentType)) {
-                                $contentType = $headerContentType[count($headerContentType) - 1];
-                            } else {
-                                $contentType = $headerContentType;
-                            }
-                            $type = explode(";", $contentType)[0];
-                            if (str_contains($type, '/xml') || str_contains($type, '+xml')){
-                                $type = self::getMimeTypeExtensionByResponse($url) ?? $type;
-                            }
-                            $mimeTypeExtension = self::getMimetypeExtension($type);
-                            if ($mimeTypeExtension) {
-                                $extension = $mimeTypeExtension;
+                        if ($hasStatusOk) {
+                            $headerContentType = $headers["Content-Type"];
+                            if (!empty($headerContentType)) {
+                                if (is_array($headerContentType)) {
+                                    $contentType = $headerContentType[count($headerContentType) - 1];
+                                } else {
+                                    $contentType = $headerContentType;
+                                }
+                                $type = explode(";", $contentType)[0];
+                                if (str_contains($type, '/xml') || str_contains($type, '+xml')) {
+                                    $type = self::getMimeTypeExtensionByResponse($url) ?? $type;
+                                }
+                                $mimeTypeExtension = self::getMimetypeExtension($type);
+                                if ($mimeTypeExtension) {
+                                    $extension = $mimeTypeExtension;
+                                }
                             }
                         }
                     }
@@ -62,7 +64,7 @@ class MimeTypeHelper
 
     public static function getMimeTypeExtensionByResponse(string $url): bool|string
     {
-        if (($response = @file_get_contents($url)) !== false) {
+        if (($response = HttpHelper::getFileContent($url)) !== false) {
             $response = strtolower($response);
             if (str_contains($response, "<csw:capabilities")) {
                 return "csw";
