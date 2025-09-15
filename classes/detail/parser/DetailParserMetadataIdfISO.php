@@ -1642,9 +1642,11 @@ class DetailParserMetadataIdfISO
             $value = IdfHelper::getNodeValue($node, './idf:mapUrl');
             if (!isset($value)) {
                 $serviceUrl = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor][text() = 'GetCapabilities']/../../srv:connectPoint//gmd:URL");
-                $serviceType = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceType/*");
-                $serviceVersion = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceTypeVersion/*");
-                $value = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType);
+                if ($serviceUrl) {
+                    $serviceType = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceType/*");
+                    $serviceVersion = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceTypeVersion/*");
+                    $value = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType);
+                }
             }
         }
         return $value;
