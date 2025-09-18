@@ -17,4 +17,23 @@ class HttpHelper
         $context = stream_context_create( $opts );
         return @file_get_contents($url, false, $context);
     }
+
+    public static function getHttpFile(string $url): string|bool
+    {
+        $remoteFile = fopen($url, 'rb');
+        if (!$remoteFile) {
+            fclose($remoteFile);
+            return false;
+        }
+
+        $content = '';
+        while (!feof($remoteFile)) {
+            // Read chunk of data from remote file
+            $content .= fread($remoteFile, 4096); // Adjust chunk size as needed
+        }
+
+        fclose($remoteFile);
+
+        return $content;
+    }
 }

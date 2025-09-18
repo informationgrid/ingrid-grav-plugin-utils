@@ -201,7 +201,7 @@ class DetailParserMetadataIdfISO
         $xpathExpression = './gmd:dataSetURI/gco:CharacterString';
         $metadata->geodatenLink = IdfHelper::getNodeValue($node, $xpathExpression);
 
-        $xpathExpression = './gmd:identificationInfo/gmd:MD_DataIdentification/gmd:supplementalInformation/gco:CharacterString';
+        $xpathExpression = './gmd:identificationInfo/gmd:MD_DataIdentification/gmd:supplementalInformation/*[self::gco:CharacterString or self::gmx:Anchor]';
         $metadata->internalNotes = IdfHelper::getNodeValue($node, $xpathExpression);
 
         $xpathExpression = './idf:treePath/gco:CharacterString';
