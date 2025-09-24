@@ -33,7 +33,8 @@ class DetailParserMetadataIdfISO
         $metadata->hasAccessConstraint = IdfHelper::getNodeBoolValue($node, $xpathExpression);
 
         $metadata->previews = self::getPreviews($node);
-        $metadata->mapUrl = IdfHelper::getNodeValue($node, './idf:mapUrl') ?? self::getMapUrl($node, $metadata->metaClass);
+        $metadata->mapUrl = self::getMapUrl($node, $metadata->metaClass);
+        $metadata->mapUrlClient = IdfHelper::getNodeValue($node, './idf:mapUrl');
         $metadata->links = self::getLinkRefs($node, $metadata->metaClass, $lang);
         $metadata->contacts = self::getContactRefs($node, $lang);
 
