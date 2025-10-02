@@ -348,7 +348,7 @@ class DetailParserMetadataIdfISO
                 preg_match('#EPSG( |:)[0-9]*#', $title, $matches);
                 foreach ($matches as $match) {
                     if (str_contains($match, "EPSG")) {
-                        $epsg = filter_var($title, FILTER_SANITIZE_NUMBER_INT);
+                        $epsg = filter_var($match, FILTER_SANITIZE_NUMBER_INT);
                         if (!empty($epsg)) {
                             $url = $reference_system_link . $epsg;
                             break;
