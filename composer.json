@@ -30,6 +30,7 @@
       "classes/utils/CountryHelper.php",
       "classes/utils/MimeTypeHelper.php",
       "classes/utils/HttpHelper.php",
+      "classes/utils/DebugHelper.php",
       "classes/utils/SearchQueryHelper.php",
       "classes/utils/TMPeriodDurationHelper.php",
       "classes/utils/ElasticsearchHelper.php",

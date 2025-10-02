@@ -13,15 +13,10 @@ class RssIndex
 
     public static function indexJob(array $feeds): void
     {
-        $grav = Grav::instance();
-        $log = $grav['log'];
-        $isDebug = $grav['config']->get('plugins.ingrid-grav-utils.debug');
-        if ($isDebug) {
-            $log->debug('Start job: RSS Indexing');
-        }
+        DebugHelper::debug('Start job: RSS Indexing');
         $array = array();
         foreach($feeds as $feed) {
-            self::getRssFeedItems($feed, $array, $log);
+            self::getRssFeedItems($feed, $array);
         }
         $names = array();
         #iterating over the arr
@@ -39,14 +34,11 @@ class RssIndex
             "data" => $array
         );
         self::writeJsonFile(json_encode($result, JSON_PRETTY_PRINT), "user-data://feeds", "feeds.json");
-        if ($isDebug) {
-            $log->debug('Finished job: RSS Indexing');
-            }
+        DebugHelper::debug('Finished job: RSS Indexing');
     }
 
     private static function getRssFeedItems(array $feed, array &$array): void
     {
-        $log = Grav::instance()['log'];
         $url = $feed["url"];
         $lang = $feed["lang"];
         $summary = $feed["summary"];
@@ -54,7 +46,7 @@ class RssIndex
         $category = $feed["category"];
 
         try {
-            if (($response = HttpHelper::getFileContent($url)) !== false) {
+            if (($response = HttpHelper::getHttpContent($url)) !== false) {
                 $content = simplexml_load_string($response);
                 $itemNodes = $content->xpath("//item");
                 foreach ($itemNodes as $itemNode) {
@@ -74,7 +66,7 @@ class RssIndex
                     $array[] = $item;
                 }
             } else {
-                $log->error('Error load RSS-URL: ' . $url);
+                DebugHelper::error('Error load RSS-URL: ' . $url);
             }
         } catch (Exception $e) {
         }

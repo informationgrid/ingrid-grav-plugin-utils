@@ -24,20 +24,9 @@ class MimeTypeHelper
         if (empty($extension)) {
             if (str_starts_with($url, "http://") || str_starts_with($url, "https://")) {
                 try {
-                    $headers = HttpHelper::getHeader($url);
+                    [$status, $headers] = HttpHelper::getHeader($url);
                     if ($headers) {
-                        $hasStatusOk = false;
-
-                        foreach ($headers as $key => $head) {
-                            if (is_numeric($key)) {
-                                if (str_contains($head, " 20")) {
-                                    $hasStatusOk = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if ($hasStatusOk) {
+                        if ($status == 200) {
                             $headerContentType = $headers["Content-Type"];
                             if (!empty($headerContentType)) {
                                 if (is_array($headerContentType)) {
@@ -47,17 +36,20 @@ class MimeTypeHelper
                                 }
                                 $type = explode(";", $contentType)[0];
                                 if (str_contains($type, '/xml') || str_contains($type, '+xml')) {
-                                    $type = self::getMimeTypeExtensionByResponse($url) ?? $type;
+                                    $extension = self::getMimeTypeExtensionByResponse($url);
+                                    if ($extension) {
+                                        return $extension;
+                                    }
                                 }
                                 $mimeTypeExtension = self::getMimetypeExtension($type);
                                 if ($mimeTypeExtension) {
-                                    $extension = $mimeTypeExtension;
+                                    return $mimeTypeExtension;
                                 }
                             }
                         }
                     }
                 } catch(\Exception $e) {
-                    Grav::instance()['log']->error('Error get mime type for ' . $url . ': ' . $e->getMessage());
+                    DebugHelper::error('Error get mime type for ' . $url . ': ' . $e->getMessage());
                 }
             }
         }
@@ -66,7 +58,7 @@ class MimeTypeHelper
 
     public static function getMimeTypeExtensionByResponse(string $url): bool|string
     {
-        if (($response = HttpHelper::getFileContent($url)) !== false) {
+        if (($response = HttpHelper::getHttpContent($url)) !== false) {
             $response = strtolower($response);
             if (str_contains($response, "<csw:capabilities")) {
                 return "csw";

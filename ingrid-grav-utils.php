@@ -160,7 +160,7 @@ class IngridGravUtilsPlugin extends Plugin
                 $this->grav['assets']->addCss('plugin://ingrid-grav-utils/assets/admin/rss/rss.css');
                 $this->grav['assets']->addJs('plugin://ingrid-grav-utils/assets/admin/rss/rss.js');
             } catch (\Exception $e) {
-                $this->grav['log']->error($e->getMessage());
+                DebugHelper::error($e->getMessage());
             }
         }
     }
