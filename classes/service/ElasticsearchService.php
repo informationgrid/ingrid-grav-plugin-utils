@@ -288,12 +288,7 @@ class ElasticsearchService
 
                     if (isset($foundObject['filter'])) {
                         $facetFilter = sprintf($foundObject['filter'], ...explode(self::$FACET_ENTRY_VALUE_SEPARATOR, $selectedFacetValues));
-                        if (str_starts_with($facetFilter, '{')) {
-                            $splits = explode(self::$FILTER_QUERY_SEPARATOR, $facetFilter);
-                            foreach ($splits as $split) {
-                                $shouldGroup[] = json_decode($split, true);
-                            }
-                        }
+                        $shouldGroup[] = json_decode($facetFilter, true);
                     }
                 } elseif ($selectedFacetId === 'timeref') {
                     $selectedFacet = self::findByFacetId($facetConfig, $selectedFacetId);
@@ -303,9 +298,7 @@ class ElasticsearchService
 
                     if (isset($foundObject['filter'])) {
                         $facetFilter = sprintf($foundObject['filter'], ...explode(self::$FACET_ENTRY_VALUE_SEPARATOR, $selectedFacetValues));
-                        if (str_starts_with($facetFilter, '{')) {
-                            $shouldGroup[] = json_decode($facetFilter, true);
-                        }
+                        $shouldGroup[] = json_decode($facetFilter, true);
                     }
                 } else {
                     $values = explode(self::$FACET_ENTRIES_SEPARATOR, $selectedFacetValues);
