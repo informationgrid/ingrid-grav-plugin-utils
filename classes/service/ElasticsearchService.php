@@ -238,7 +238,8 @@ class ElasticsearchService
             // we need to combine facets within a group by OR
             $filter[] = '{"bool": { "should": [ ' . join(self::$FILTER_QUERY_SEPARATOR, $tempFilter) . ']}}';
         } else if (property_exists((object)$foundObject, 'filter')) {
-            $filter[] = sprintf($foundObject['filter'], ...explode(self::$FACET_ENTRY_VALUE_SEPARATOR, $selectionValue));
+            $tmpValues = explode(self::$FACET_ENTRY_VALUE_SEPARATOR, $selectionValue);
+            $filter[] = sprintf($foundObject['filter'], ...array_merge($tmpValues, $tmpValues));
         }
         return array($result, $filter);
     }
@@ -287,7 +288,8 @@ class ElasticsearchService
                     $foundObject = reset($selectedFacet);
 
                     if (isset($foundObject['filter'])) {
-                        $facetFilter = sprintf($foundObject['filter'], ...explode(self::$FACET_ENTRY_VALUE_SEPARATOR, $selectedFacetValues));
+                        $tmpValues = explode(self::$FACET_ENTRY_VALUE_SEPARATOR, $selectedFacetValues);
+                        $facetFilter = sprintf($foundObject['filter'], ...array_merge($tmpValues, $tmpValues));
                         $shouldGroup[] = json_decode($facetFilter, true);
                     }
                 } elseif ($selectedFacetId === 'timeref') {
