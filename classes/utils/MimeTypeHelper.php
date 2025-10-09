@@ -9,6 +9,8 @@ class MimeTypeHelper
 {
     public static function getUrlMimetype(string $url): string
     {
+        DebugHelper::debug('Start getUrlMimetype() from ' . $url);
+        $extension = null;
         if (str_contains(strtolower($url), "service=csw")) {
             $extension = "csw";
         } else if(str_contains(strtolower($url), "service=wms")) {
@@ -21,7 +23,7 @@ class MimeTypeHelper
             $extension = "wmts";
         }
 
-        if (empty($extension)) {
+        if (!$extension) {
             if (str_starts_with($url, "http://") || str_starts_with($url, "https://")) {
                 try {
                     [$status, $headers] = HttpHelper::getHeader($url);
@@ -37,13 +39,9 @@ class MimeTypeHelper
                                 $type = explode(";", $contentType)[0];
                                 if (str_contains($type, '/xml') || str_contains($type, '+xml')) {
                                     $extension = self::getMimeTypeExtensionByResponse($url);
-                                    if ($extension) {
-                                        return $extension;
-                                    }
                                 }
-                                $mimeTypeExtension = self::getMimetypeExtension($type);
-                                if ($mimeTypeExtension) {
-                                    return $mimeTypeExtension;
+                                if (!$extension) {
+                                    $extension = self::getMimetypeExtension($type);
                                 }
                             }
                         }
@@ -53,6 +51,7 @@ class MimeTypeHelper
                 }
             }
         }
+        DebugHelper::debug('End getUrlMimetype() from ' . $url);
         return $extension ?? "";
     }
 

@@ -516,19 +516,21 @@ class DetailParserMetadataIdfISO
                 "attachedToField" => $type != "1" ? $attachedToField : null,
                 "kind" => "object",
             );
-            if ($serviceUrl) {
-                $mapUrl = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType, self::getIdentifier($node, $type, $tmpNode));
-                if (isset($mapUrl)) {
-                    $item["mapUrl"] = $mapUrl;
-                }
-            }
             if ($serviceType || $serviceVersion) {
                 $service = CapabilitiesHelper::getHitServiceType($serviceVersion, $serviceType);
                 if (isset($service)) {
                     $item["serviceType"] = $service;
+                    if (strcasecmp($service, 'wms') == 0
+                        or strcasecmp($service, 'wmts') == 0
+                        or strcasecmp($service, 'view') == 0
+                    ) {
+                        $mapUrl = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType, self::getIdentifier($node, $type, $tmpNode));
+                        if (isset($mapUrl)) {
+                            $item["mapUrl"] = $mapUrl;
+                        }
+                    }
                 }
             }
-
             $array[] = $item;
         }
 
@@ -551,7 +553,7 @@ class DetailParserMetadataIdfISO
                 "type" => $type,
                 "type_name" => CodelistHelper::getCodelistEntry(["8000"], $type, $lang),
                 "cswUrl" => $cswUrl,
-                //attachedToField" => $attachedToField,
+                "attachedToField" => $attachedToField,
                 "applicationProfile" => $applicationProfile,
                 "kind" => "object",
             );
@@ -597,7 +599,6 @@ class DetailParserMetadataIdfISO
                 "url" => $url,
                 "title" => $title ?? $url,
                 "description" => $description,
-                "attachedToField" => $attachedToField,
                 "applicationProfile" => $applicationProfile,
                 "linkInfo" => $size ? "[" . $size . "MB]" : null,
                 "kind" => "download",
@@ -1646,7 +1647,12 @@ class DetailParserMetadataIdfISO
                 if ($serviceUrl) {
                     $serviceType = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceType/*");
                     $serviceVersion = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceTypeVersion/*");
-                    $value = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType);
+                    if ((isset($serviceType) && (strtolower(trim($serviceType)) == 'view' || strtolower(trim($serviceType)) == 'wms') || strtolower(trim($serviceType)) == 'wmts') &&
+                        ((str_contains(strtolower($serviceUrl), 'request=getcapabilities') && (str_contains(strtolower($serviceUrl), 'service=wms')) || str_contains(strtolower($serviceUrl), 'service=wmts')) ||
+                            str_contains(strtolower($serviceUrl), 'wmtscapabilities.xml'))
+                    ) {
+                        $value = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType);
+                    }
                 }
             }
         }
