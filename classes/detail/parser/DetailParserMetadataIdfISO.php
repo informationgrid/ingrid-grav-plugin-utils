@@ -504,7 +504,7 @@ class DetailParserMetadataIdfISO
             $serviceType = IdfHelper::getNodeValue($tmpNode, "./idf:serviceType");
             $serviceUrl = IdfHelper::getNodeValue($tmpNode, "./idf:serviceUrl");
             $extMapUrl = IdfHelper::getNodeValue($tmpNode, "./idf:mapUrl");
-            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./idf:attachedToField[not(@entry-id='9900') and not(@entry-id='3600')]");
+            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./idf:attachedToField[not(@entry-id='9990') and not(@entry-id='3600')]");
             $item = array (
                 "uuid" => $uuid,
                 "title" => $title,
@@ -544,7 +544,7 @@ class DetailParserMetadataIdfISO
             $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
             $cswUrl = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
-            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField[not(@entry-id='9900') and not(@entry-id='3600')]");
+            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField[not(@entry-id='9990') and not(@entry-id='3600')]");
             $applicationProfile = IdfHelper::getNodeValue($tmpNode, "./*/gmd:applicationProfile/*[self::gco:CharacterString or self::gmx:Anchor]");
             $type = "1";
             $item = array (
