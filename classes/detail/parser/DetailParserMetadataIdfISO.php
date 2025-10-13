@@ -1308,9 +1308,11 @@ class DetailParserMetadataIdfISO
             }
             $meters[] = $value . " " . $unit;
         }
-        self::addToArray($array, "denominators", $denominators);
-        self::addToArray($array, "dpis", $dpis);
-        self::addToArray($array, "meters", $meters);
+        if (!empty($denominators) or !empty($dpis) or !empty($meters)){
+            self::addToArray($array, "denominators", $denominators);
+            self::addToArray($array, "dpis", $dpis);
+            self::addToArray($array, "meters", $meters);
+        }
         return $array;
     }
 
