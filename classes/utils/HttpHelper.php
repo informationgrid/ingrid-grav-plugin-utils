@@ -1,5 +1,6 @@
 <?php
 namespace Grav\Plugin;
+use Grav\Common\Grav;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -12,6 +13,14 @@ class HttpHelper
         $clientOptions = [
             'connect_timeout' => 10
         ];
+        $httpConfig = Grav::instance()['config']->get('system.http');
+        $httpConfigProxyUrl = $httpConfig['proxy_url'];
+        if (!empty($httpConfigProxyUrl)) {
+            $clientOptions['proxy'] = [
+                'http' => $httpConfigProxyUrl,
+                'https' => $httpConfigProxyUrl,
+            ];
+        }
         $res = null;
         try {
             $res = $client->request('HEAD', $url, $clientOptions);
@@ -39,6 +48,14 @@ class HttpHelper
         $clientOptions = [
             'connect_timeout' => 10
         ];
+        $httpConfig = Grav::instance()['config']->get('system.http');
+        $httpConfigProxyUrl = $httpConfig['proxy_url'];
+        if (!empty($httpConfigProxyUrl)) {
+            $clientOptions['proxy'] = [
+                'http' => $httpConfigProxyUrl,
+                'https' => $httpConfigProxyUrl,
+            ];
+        }
         try {
             $res = $client->request('GET', $url, $clientOptions);
             return $res->getBody()->getContents();
