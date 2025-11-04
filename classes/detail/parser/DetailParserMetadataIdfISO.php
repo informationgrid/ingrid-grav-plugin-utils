@@ -1625,6 +1625,9 @@ class DetailParserMetadataIdfISO
                         $serviceVersion =  IdfHelper::getNodeValue($crossRefNode, "./idf:serviceVersion");
                         if (isset($serviceUrl)) {
                             $value = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType, self::getIdentifier($node, $type));
+                            if (isset($value)) {
+                                break;
+                            }
                         }
                     }
                 }
