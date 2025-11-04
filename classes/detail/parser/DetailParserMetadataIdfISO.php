@@ -208,6 +208,8 @@ class DetailParserMetadataIdfISO
         $xpathExpression = './idf:treePath/gco:CharacterString';
         $metadata->folderNames = IdfHelper::getNodeValue($node, $xpathExpression);
 
+        $metadata->geometryContext = self::getGeometryContext($node, $lang);
+
         return $metadata;
     }
 
@@ -1796,6 +1798,32 @@ class DetailParserMetadataIdfISO
             "rows" => $rows,
             "infos" => IdfHelper::getNodeValueList($node, $xpathExpression . '/' . $xpathSubEpressionInfo)
         );
+    }
+
+    private static function getGeometryContext(\SimpleXMLElement $node, string $lang): array
+    {
+        $array = [];
+        $tmpNodes = IdfHelper::getNodeList($node, './gmd:spatialRepresentationInfo/igctx:MD_GeometryContext[./*]') ?? [];
+        foreach ($tmpNodes as $tmpNode) {
+            $tmpSubNodeType = IdfHelper::getNodeValue($tmpNode, './igctx:geometryType/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '';
+            $tmpSubNodeName = IdfHelper::getNodeValue($tmpNode, './igctx:geometricFeature/*/igctx:featureName/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '';
+            $tmpSubNodeDescription = IdfHelper::getNodeValue($tmpNode, './igctx:geometricFeature/*/igctx:featureDescription/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '';
+            $tmpSubNodeFeatures = IdfHelper::getNodeList($tmpNode, './igctx:geometricFeature/*/igctx:featureAttributes/igctx:FeatureAttributes/igctx:attribute/igctx:OtherFeatureAttribute[./igctx:attributeCode|igctx:attributeContent]') ?? [];
+            $features = [];
+            foreach ($tmpSubNodeFeatures as $tmpSubNodeFeature) {
+                $features[] = array(
+                    'code' => IdfHelper::getNodeValue($tmpSubNodeFeature, './igctx:attributeContent/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '',
+                    'description' => IdfHelper::getNodeValue($tmpSubNodeFeature, './igctx:attributeDescription/*[self::gco:CharacterString or self::gmx:Anchor]') ?? ''
+                );
+            }
+            $array[] = array(
+                'type' => $tmpSubNodeType,
+                'name' => $tmpSubNodeName,
+                'description' => $tmpSubNodeDescription,
+                'features' => $features
+            );
+        }
+        return $array;
     }
 
 }
