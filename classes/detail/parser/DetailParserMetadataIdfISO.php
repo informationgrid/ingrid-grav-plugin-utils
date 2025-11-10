@@ -210,6 +210,10 @@ class DetailParserMetadataIdfISO
 
         $metadata->geometryContext = self::getGeometryContext($node, $lang);
 
+        $xpathExpression = './idf:additionalDataSection[@id="projectInfo"]';
+        $metadata->projectNumber = IdfHelper::getNodeValue($node, $xpathExpression . '/idf:projectNumber');
+        $metadata->projectTitle = IdfHelper::getNodeValue($node, $xpathExpression . '/idf:projectTitle');
+
         return $metadata;
     }
 
