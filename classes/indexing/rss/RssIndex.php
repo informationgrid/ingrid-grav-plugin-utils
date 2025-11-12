@@ -73,7 +73,7 @@ class RssIndex
                         $tmpDate = date_create($date);
                         if ($tmpDate) {
                             $rssDate = date_format($tmpDate, "d.m.y");
-                            $rssTime = date_format($tmpDate, "H:i:s");
+                            $rssTime = date_format($tmpDate, "H:i");
                             $rssDateMs = (float)date_format($tmpDate, "Uv");
                         }
                     }
@@ -89,7 +89,7 @@ class RssIndex
                         "title" => $title,
                         "url" => $link,
                         "date" => $rssDate ?? $dateNow->format('d.m.Y'),
-                        "time" => isset($rssTime) && $rssTime != "00:00:00" ? $rssTime : null,
+                        "time" => isset($rssTime) && $rssTime != "00:00" ? $rssTime : null,
                         "date_ms" => $rssDateMs ?? $dateNow->format('uv'),
                         "summary" => $description,
                         "provider" => $summary ?? $provider,
