@@ -36,18 +36,20 @@ class IdfHelper
         $tmpNode = $node->xpath($xpath);
         if ($tmpNode) {
             $value = (string) $tmpNode[0];
-            if ($codelist && $lang) {
-                $codelistValue = CodelistHelper::getCodelistEntry($codelist, $value, $lang);
-                if ($codelistValue == null) {
-                    $codelistValue = CodelistHelper::getCodelistEntryByIso($codelist, $value, $lang);
+            if (!isset($value)) {
+                if ($codelist && $lang) {
+                    $codelistValue = CodelistHelper::getCodelistEntry($codelist, $value, $lang);
+                    if ($codelistValue == null) {
+                        $codelistValue = CodelistHelper::getCodelistEntryByIso($codelist, $value, $lang);
+                    }
+                    if ($codelistValue == null) {
+                        $codelistValue = CodelistHelper::getCodelistEntryByData($codelist, $value, $lang);
+                    }
+                    if ($codelistValue == null) {
+                        $codelistValue = $value;
+                    }
+                    return $codelistValue;
                 }
-                if ($codelistValue == null) {
-                    $codelistValue = CodelistHelper::getCodelistEntryByData($codelist, $value, $lang);
-                }
-                if ($codelistValue == null) {
-                    $codelistValue = $value;
-                }
-                return $codelistValue;
             } else {
                 return $value;
             }
