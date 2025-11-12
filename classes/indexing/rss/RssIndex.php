@@ -1,8 +1,8 @@
 <?php
 
 namespace Grav\Plugin;
-use Grav\Common\Grav;
-use SimpleXMLElement;
+
+use DateTime;
 use Exception;
 
 class RssIndex
@@ -15,8 +15,10 @@ class RssIndex
     {
         DebugHelper::debug('Start job: RSS Indexing');
         $array = array();
+        $existingRss = HttpHelper::getFileContent('user-data://feeds/feeds.json');
+
         foreach($feeds as $feed) {
-            self::getRssFeedItems($feed, $array);
+            self::getRssFeedItems($feed, $array, json_decode($existingRss, true));
         }
         $names = array();
         #iterating over the arr
@@ -37,7 +39,7 @@ class RssIndex
         DebugHelper::debug('Finished job: RSS Indexing');
     }
 
-    private static function getRssFeedItems(array $feed, array &$array): void
+    private static function getRssFeedItems(array $feed, array &$array, ?array $existingRss): void
     {
         $url = $feed["url"];
         $lang = $feed["lang"];
@@ -49,21 +51,68 @@ class RssIndex
             if (($response = HttpHelper::getHttpContent($url)) !== false) {
                 $content = simplexml_load_string($response);
                 $itemNodes = $content->xpath("//item");
+                $dateNow = new DateTime();
                 foreach ($itemNodes as $itemNode) {
                     $title = (string)$itemNode->title;
                     $link = (string)$itemNode->link;
                     $date = (string)$itemNode->pubDate;
+
+                    if (!$date) {
+                        # Extract date from url
+                        if (preg_match_all('/\d{2}\d{2}\d{2}/',$link,$matches)) {
+                            if ($matches) {
+                                $date = DateTime::createFromFormat("!ymd", $matches[0][0]);
+                                if ($date) {
+                                    $date = $date->format('Y-m-d T');
+                                }
+                            }
+                        }
+                    }
+
+                    if ($date) {
+                        $tmpDate = date_create($date);
+                        if ($tmpDate) {
+                            $rssDate = date_format($tmpDate, "d.m.y");
+                            $rssTime = date_format($tmpDate, "H:i:s");
+                            $rssDateMs = (float)date_format($tmpDate, "Uv");
+                        }
+                    }
+
+                    if ($date) {
+                        if ($dateNow < new DateTime($date)) {
+                            break;
+                        }
+                    }
                     $description = strip_tags((string)$itemNode->description);
+
                     $item = array(
                         "title" => $title,
                         "url" => $link,
-                        "date" => $date ? date_format(date_create($date), "d.m.y") : "",
-                        "time" => $date ? date_format(date_create($date), "H:i:s") : "",
-                        "date_ms" => $date ? (float)date_format(date_create($date), "Uv") : "",
+                        "date" => $rssDate ?? $dateNow->format('d.m.Y'),
+                        "time" => isset($rssTime) && $rssTime != "00:00:00" ? $rssTime : null,
+                        "date_ms" => $rssDateMs ?? $dateNow->format('uv'),
                         "summary" => $description,
                         "provider" => $summary ?? $provider,
                     );
-                    $array[] = $item;
+
+                    if ($date) {
+                        $array[] = $item;
+                    } else {
+                        $existItem = false;
+                        if (isset($existingRss['data'])) {
+                            foreach ($existingRss['data'] as $rssItem) {
+                                if ($rssItem['url'] === $link && $rssItem['title'] === $title) {
+                                    $existItem = $rssItem;
+                                    break;
+                                }
+                            }
+                        }
+                        if ($existItem) {
+                            $array[] = $existItem;
+                        } else {
+                            $array[] = $item;
+                        }
+                    }
                 }
             } else {
                 DebugHelper::error('Error load RSS-URL: ' . $url);
