@@ -318,6 +318,7 @@ class DetailParserMetadataIdfISO
         $metadata->bwastrs = self::getBwaStrs($node);
         $metadata->geographicElement = self::getGeographicElements($node, $lang);
         $metadata->areaHeight = self::getAreaHeight($node, $lang);
+        $metadata->areaHeightEpsg = self::getAreaHeightEpsg($node, $lang);
         $metadata->referenceSystemId = self::getReferences($node);
     }
 
@@ -492,6 +493,34 @@ class DetailParserMetadataIdfISO
         }
         return $array;
     }
+
+    private static function getAreaHeightEpsg(\SimpleXMLElement $node, string $lang): array
+    {
+        $array = [];
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:verticalElement/gmd:EX_VerticalExtent[./*]");
+        foreach ($tmpNodes as $tmpNode) {
+            $item = [];
+
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:minimumValue/gco:Real"),
+                "type" => "text"
+            );
+
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:maximumValue/gco:Real"),
+                "type" => "text"
+            );
+
+            $item[] = array(
+                "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:verticalCRS/@xlink:title"),
+                "type" => "text"
+            );
+
+            $array[] = $item;
+        }
+        return $array;
+    }
+
 
     private static function getLinkRefs(\SimpleXMLElement $node, string $objType, string $lang): array
     {
