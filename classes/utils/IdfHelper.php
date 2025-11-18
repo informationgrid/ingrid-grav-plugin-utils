@@ -36,7 +36,7 @@ class IdfHelper
         $tmpNode = $node->xpath($xpath);
         if ($tmpNode) {
             $value = (string) $tmpNode[0];
-            if (!empty($value)) {
+            if (strlen($value) > 0) {
                 if ($codelist && $lang) {
                     $codelistValue = CodelistHelper::getCodelistEntry($codelist, $value, $lang);
                     if ($codelistValue == null) {
