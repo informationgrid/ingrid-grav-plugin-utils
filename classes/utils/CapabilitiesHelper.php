@@ -2,6 +2,8 @@
 
 namespace Grav\Plugin;
 
+use Grav\Common\Grav;
+
 class CapabilitiesHelper
 {
 
@@ -52,50 +54,71 @@ class CapabilitiesHelper
 
     public static function getMapUrl(string $url, ?string $serviceVersion = null, ?string $serviceType = null, ?string $additional = null): ?string
     {
-        if ($serviceVersion) {
-            $tmpService = self::extractServiceFromServiceTypeVersion($serviceVersion);
-            if ($tmpService) {
-                if(str_contains(strtolower($tmpService), 'wms') || str_contains(strtolower($tmpService), 'wmts')) {
-                    $service = $tmpService;
-                }
-            }
-        }
-        if (strpos($url, '?')) {
-            if (!stripos($url, 'request=getcapabilities')) {
-                $url .= '&REQUEST=GetCapabilities';
-            }
-            if (isset($service)) {
-                if ($serviceType) {
-                    $codelistValue = CodelistHelper::getCodelistEntryByIso(['5100'], $serviceType, 'de');
-                    if (empty($codelistValue)) {
-                        $service = $serviceType;
+        if (!empty($url)) {
+            if ($serviceVersion) {
+                $tmpService = self::extractServiceFromServiceTypeVersion($serviceVersion);
+                if ($tmpService) {
+                    if (str_contains(strtolower($tmpService), 'wms') || str_contains(strtolower($tmpService), 'wmts')) {
+                        $service = $tmpService;
                     }
                 }
             }
-        } else {
-            $service = 'WMTS';
-        }
-        if (isset($service)) {
-            if (!stripos($url, 'service=')) {
-                $url .= '&SERVICE=' . $service;
+            if (strpos($url, '?')) {
+                if (!stripos($url, 'request=getcapabilities')) {
+                    $url .= '&REQUEST=GetCapabilities';
+                }
+                if (isset($service)) {
+                    if ($serviceType) {
+                        $codelistValue = CodelistHelper::getCodelistEntryByIso(['5100'], $serviceType, 'de');
+                        if (empty($codelistValue)) {
+                            $service = $serviceType;
+                        }
+                    }
+                }
+            } else {
+                $service = 'WMTS';
             }
-            $layersParam = $service . '||' . $url;
-            if ($additional != null && $additional !==  'NOT_FOUND') {
-                $layersParam .= '||' . $additional;
-            }
-            return urlencode($layersParam);
-        } else if (!empty($url) && ($serviceType === "view")) {
+            $layersParam = '';
             $defaultService = "WMS";
-            if (str_contains('?', $url)) {
-                if (str_contains('service=', strtolower($url))) {
-                   $url .= '&SERVICE=' . $defaultService;
+
+            $config = Grav::instance()['config'];
+            $theme = $config->get('system.pages.theme');
+            $is_masterportal = $config->get('themes.' . $theme . '.map.is_masterportal');
+
+            if (!isset($service) && $serviceType === "view") {
+                $service = $defaultService;
+            }
+
+            if ($is_masterportal) {
+                if (isset($service)) {
+                    $layerArray = array(
+                        'secondary' => array(
+                            'currentComponent' => 'serviceImport',
+                            'attributes' => array(
+                                'type' => 'serviceImport',
+                                'url' => $url,
+                                'serviceType' => $service
+                            )
+                        )
+                    );
+                    return '?MENU=' . urlencode(json_encode($layerArray));
+                }
+            } else {
+                if (isset($service)) {
+                    if (str_contains('?', $url)) {
+                        if (str_contains('service=', strtolower($url))) {
+                            $url .= '&SERVICE=' . $service;
+                        }
+                    }
+                    $layersParam = $service . '||' . $url;
+                    if (!empty($layersParam)) {
+                        if ($additional != null && $additional !== 'NOT_FOUND') {
+                            $layersParam .= '||' . $additional;
+                        }
+                        return '?layers=' . urlencode($layersParam);
+                    }
                 }
             }
-            $layersParam = $defaultService . '||' . $url;
-            if ($additional != null && $additional !==  'NOT_FOUND') {
-                $layersParam .= '||' . $additional;
-            }
-            return urlencode($layersParam);
         }
         return null;
     }
