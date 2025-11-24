@@ -551,7 +551,7 @@ class DetailParserMetadataIdfISO
                 "attachedToField" => $type != "1" ? $attachedToField : null,
                 "kind" => "object",
             );
-            if ($serviceType || $serviceVersion) {
+            if (isset($serviceUrl) && ($serviceType || $serviceVersion)) {
                 $service = CapabilitiesHelper::getHitServiceType($serviceVersion, $serviceType);
                 if (isset($service)) {
                     $item["serviceType"] = $service;
