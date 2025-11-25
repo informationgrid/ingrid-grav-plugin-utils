@@ -91,17 +91,28 @@ class CapabilitiesHelper
 
             if ($is_masterportal) {
                 if (isset($service)) {
-                    $layerArray = array(
-                        'secondary' => array(
-                            'currentComponent' => 'serviceImport',
-                            'attributes' => array(
-                                'type' => 'serviceImport',
+                    if ($additional != null && $additional !== 'NOT_FOUND') {
+                        $layerArray = array(
+                            array(
+                                'typ' => 'serviceImport',
                                 'url' => $url,
-                                'serviceType' => $service
+                                'identifier' => $additional
                             )
-                        )
-                    );
-                    return '?MENU=' . urlencode(json_encode($layerArray));
+                        );
+                        return '?ImportLayers=' . urlencode(json_encode($layerArray));
+                    } else {
+                        $layerArray = array(
+                            'secondary' => array(
+                                'currentComponent' => 'serviceImport',
+                                'attributes' => array(
+                                    'type' => 'serviceImport',
+                                    'url' => $url,
+                                    'serviceType' => $service
+                                )
+                            )
+                        );
+                        return '?MENU=' . urlencode(json_encode($layerArray));
+                    }
                 }
             } else {
                 if (isset($service)) {
