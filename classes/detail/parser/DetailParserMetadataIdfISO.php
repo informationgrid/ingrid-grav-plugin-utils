@@ -539,7 +539,14 @@ class DetailParserMetadataIdfISO
             $serviceType = IdfHelper::getNodeValue($tmpNode, "./idf:serviceType");
             $serviceUrl = IdfHelper::getNodeValue($tmpNode, "./idf:serviceUrl");
             $extMapUrl = IdfHelper::getNodeValue($tmpNode, "./idf:mapUrl");
-            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./idf:attachedToField[not(@entry-id='9990') and not(@entry-id='3600')]");
+            $attachedToFieldXPath = "./*/idf:attachedToField[not(@entry-id='9990') and not(@entry-id='3600')]";
+            $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@list-id");
+            $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@entry-id");
+            if ($attachedToFieldListId && $attachedToFieldEntryId) {
+                $attachedToField = CodelistHelper::getCodelistEntry($attachedToFieldListId, $attachedToFieldEntryId, $lang);
+            } else {
+                $attachedToField = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath);
+            }
             $item = array (
                 "uuid" => $uuid,
                 "title" => $title,
@@ -579,7 +586,14 @@ class DetailParserMetadataIdfISO
             $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
             $cswUrl = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
-            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField[not(@entry-id='9990') and not(@entry-id='3600')]");
+            $attachedToFieldXPath ="./*/idf:attachedToField[not(@entry-id='9990') and not(@entry-id='3600')]";
+            $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "@list-id");
+            $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "@entry-id");
+            if ($attachedToFieldListId && $attachedToFieldEntryId) {
+                $attachedToField = CodelistHelper::getCodelistEntry($attachedToFieldListId, $attachedToFieldEntryId, $lang);
+            } else {
+                $attachedToField = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath);
+            }
             $applicationProfile = IdfHelper::getNodeValue($tmpNode, "./*/gmd:applicationProfile/*[self::gco:CharacterString or self::gmx:Anchor]");
             $type = "1";
             $item = array (
@@ -602,9 +616,16 @@ class DetailParserMetadataIdfISO
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
             $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
-            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField");
-            if (!isset($attachedToField)) {
-                $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue", ["2000"], $lang);
+            $attachedToFieldXPath = "./*/idf:attachedToField";
+            $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@list-id");
+            $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@entry-id");
+            if ($attachedToFieldListId && $attachedToFieldEntryId) {
+                $attachedToField = CodelistHelper::getCodelistEntry($attachedToFieldListId, $attachedToFieldEntryId, $lang);
+            } else {
+                $attachedToField = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath);
+                if (!isset($attachedToField)) {
+                    $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue", ["2000"], $lang);
+                }
             }
             $applicationProfile = IdfHelper::getNodeValue($tmpNode, "./*/gmd:applicationProfile/*[self::gco:CharacterString or self::gmx:Anchor]");
             $size = IdfHelper::getNodeValue($tmpNode, "./../gmd:transferSize/gco:Real");
@@ -627,7 +648,6 @@ class DetailParserMetadataIdfISO
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
             $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
-            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField");
             $applicationProfile = IdfHelper::getNodeValue($tmpNode, "./*/gmd:applicationProfile/*[self::gco:CharacterString or self::gmx:Anchor]");
             $size = IdfHelper::getNodeValue($tmpNode, "./../gmd:transferSize/gco:Real");
             $item = array (
@@ -724,7 +744,14 @@ class DetailParserMetadataIdfISO
                 $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
                 $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
                 $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
-                $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField");
+                $attachedToFieldXPath = "./*/idf:attachedToField";
+                $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@list-id");
+                $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@entry-id");
+                if ($attachedToFieldListId && $attachedToFieldEntryId) {
+                    $attachedToField = CodelistHelper::getCodelistEntry($attachedToFieldListId, $attachedToFieldEntryId, $lang);
+                } else {
+                    $attachedToField = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath);
+                }
                 $item = array (
                     "url" => $url,
                     "title" => $title,
@@ -743,7 +770,14 @@ class DetailParserMetadataIdfISO
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
             $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
-            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField");
+            $attachedToFieldXPath = "./*/idf:attachedToField";
+            $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@list-id");
+            $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@entry-id");
+            if ($attachedToFieldListId && $attachedToFieldEntryId) {
+                $attachedToField = CodelistHelper::getCodelistEntry($attachedToFieldListId, $attachedToFieldEntryId, $lang);
+            } else {
+                $attachedToField = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath);
+            }
             $item = array (
                 "url" => $url,
                 "title" => $title,
@@ -761,9 +795,16 @@ class DetailParserMetadataIdfISO
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
             $title = IdfHelper::getNodeValue($tmpNode, "./*/gmd:name/*[self::gco:CharacterString or self::gmx:Anchor]");
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
-            $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/idf:attachedToField");
-            if (!isset($attachedToField)) {
-                $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue", ["2000"], $lang);
+            $attachedToFieldXPath = "./*/idf:attachedToField";
+            $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@list-id");
+            $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@entry-id");
+            if ($attachedToFieldListId && $attachedToFieldEntryId) {
+                $attachedToField = CodelistHelper::getCodelistEntry($attachedToFieldListId, $attachedToFieldEntryId, $lang);
+            } else {
+                $attachedToField = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath);
+                if (!isset($attachedToField)) {
+                    $attachedToField = IdfHelper::getNodeValue($tmpNode, "./*/gmd:function/gmd:CI_OnLineFunctionCode/@codeListValue", ["2000"], $lang);
+                }
             }
             $applicationProfile = IdfHelper::getNodeValue($tmpNode, "./*/gmd:applicationProfile/*[self::gco:CharacterString or self::gmx:Anchor]");
             $size = IdfHelper::getNodeValue($tmpNode, "./../gmd:transferSize/gco:Real");
