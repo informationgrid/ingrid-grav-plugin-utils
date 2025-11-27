@@ -9,47 +9,55 @@ class CapabilitiesHelper
 
     public static function getCapabilitiesUrl(string $url, ?string $serviceVersion, ?string $serviceType): ?string
     {
-        if ($serviceVersion) {
-            $tmpService = self::extractServiceFromServiceTypeVersion($serviceVersion);
-            if ($tmpService) {
-                $service = $tmpService;
+        if (!empty($url)) {
+            if ($serviceVersion) {
+                $tmpService = self::extractServiceFromServiceTypeVersion($serviceVersion);
+                if ($tmpService) {
+                    $service = $tmpService;
+                }
             }
-        }
-        if (isset($service) && str_contains($service, " ")) {
-            return $url;
-        }
-        if (strpos($url, '?')) {
-            if (!stripos($url, 'request=getcapabilities')) {
-                $url .= '&REQUEST=GetCapabilities';
+
+            if (isset($service) && str_contains($service, " ")) {
+                return $url;
             }
-            if (!isset($service)) {
-                if ($serviceType) {
-                    $codelistValue = CodelistHelper::getCodelistEntryByIso(['5100'], $serviceType, 'de');
-                    if (empty($codelistValue)) {
-                        $service = $serviceType;
+
+            if (strpos($url, '?')) {
+                if (!isset($service)) {
+                    if (isset($serviceType)) {
+                        $codelistValue = CodelistHelper::getCodelistEntryByIso(['5100'], $serviceType, 'de');
+                        if (empty($codelistValue)) {
+                            $service = $serviceType;
+                        }
                     }
                 }
+            } else {
+                $service = 'WMTS';
             }
-        } else {
-            $service = 'WMTS';
-        }
-        if (isset($service)) {
-            if (strpos($url, '?')) {
-                if (!stripos($url, 'service=')) {
-                    $url .= '&SERVICE=' . $service;
+
+            if (!isset($service) && isset($serviceType) && $serviceType === "view") {
+                $service = 'WMS';
+            }
+
+            if (isset($service)) {
+                if (strpos($url, '?')) {
+                    $params = [];
+                    if (!stripos($url, 'request=getcapabilities')) {
+                        $params[] = 'REQUEST=GetCapabilities';
+                    }
+                    if (!stripos($url, 'service=')) {
+                        $params[] = 'SERVICE=' . $service;
+                    }
+                    if (!str_ends_with($url, '?')) {
+                        if (!str_ends_with($url, '&')) {
+                            $url .= '&';
+                        }
+                    }
+                    $url .= implode('&', $params);
                 }
+                return $url;
             }
-            return $url;
-        } else if (!empty($url) && isset($serviceType) && $serviceType === 'view'){
-            $defaultService = 'WMS';
-            if (strpos($url, '?')) {
-                if (!stripos($url, 'service=')) {
-                    $url .= '&SERVICE=' . $defaultService;
-                }
-            }
-            return $url;
         }
-        return $url;
+        return null;
     }
 
     public static function getMapUrl(string $url, ?string $serviceVersion = null, ?string $serviceType = null, ?string $additional = null): ?string
@@ -63,12 +71,10 @@ class CapabilitiesHelper
                     }
                 }
             }
+
             if (strpos($url, '?')) {
-                if (!stripos($url, 'request=getcapabilities')) {
-                    $url .= '&REQUEST=GetCapabilities';
-                }
                 if (isset($service)) {
-                    if ($serviceType) {
+                    if (isset($serviceType)) {
                         $codelistValue = CodelistHelper::getCodelistEntryByIso(['5100'], $serviceType, 'de');
                         if (empty($codelistValue)) {
                             $service = $serviceType;
@@ -78,15 +84,15 @@ class CapabilitiesHelper
             } else {
                 $service = 'WMTS';
             }
-            $layersParam = '';
+
             $defaultService = "WMS";
 
             $config = Grav::instance()['config'];
             $theme = $config->get('system.pages.theme');
             $is_masterportal = $config->get('themes.' . $theme . '.map.is_masterportal');
 
-            if (!isset($service) && $serviceType === "view") {
-                $service = $defaultService;
+            if (!isset($service) && isset($serviceType) && $serviceType === "view") {
+                $service = 'WMS';
             }
 
             if ($is_masterportal) {
@@ -94,7 +100,7 @@ class CapabilitiesHelper
                     if ($additional != null && $additional !== 'NOT_FOUND') {
                         $layerArray = array(
                             array(
-                                'typ' => 'serviceImport',
+                                'typ' => $service,
                                 'url' => $url,
                                 'identifier' => $additional
                             )
@@ -117,9 +123,19 @@ class CapabilitiesHelper
             } else {
                 if (isset($service)) {
                     if (str_contains('?', $url)) {
-                        if (str_contains('service=', strtolower($url))) {
-                            $url .= '&SERVICE=' . $service;
+                        $params = [];
+                        if (!stripos($url, 'request=getcapabilities')) {
+                            $params[] = 'REQUEST=GetCapabilities';
                         }
+                        if (!stripos($url, 'service=')) {
+                            $params[] = 'SERVICE=' . $service;
+                        }
+                        if (!str_ends_with($url, '?')) {
+                            if (!str_ends_with($url, '&')) {
+                                $url .= '&';
+                            }
+                        }
+                        $url .= implode('&', $params);
                     }
                     $layersParam = $service . '||' . $url;
                     if (!empty($layersParam)) {
