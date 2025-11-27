@@ -85,8 +85,6 @@ class CapabilitiesHelper
                 $service = 'WMTS';
             }
 
-            $defaultService = "WMS";
-
             $config = Grav::instance()['config'];
             $theme = $config->get('system.pages.theme');
             $is_masterportal = $config->get('themes.' . $theme . '.map.is_masterportal');
