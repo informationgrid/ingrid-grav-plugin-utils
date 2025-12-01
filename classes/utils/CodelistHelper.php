@@ -236,7 +236,7 @@ class CodelistHelper
                         $provider['name'] = $name;
                         $provider['ident'] = $ident;
                         $provider['url'] = $url;
-                        if ($partners[$partnerKey]) {
+                        if (isset($partners[$partnerKey])) {
                             $partners[$partnerKey]['providers'][$id]= $provider;
                         }
                     }
