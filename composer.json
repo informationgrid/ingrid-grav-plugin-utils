@@ -34,6 +34,7 @@
       "classes/utils/SearchQueryHelper.php",
       "classes/utils/TMPeriodDurationHelper.php",
       "classes/utils/ElasticsearchHelper.php",
+      "classes/utils/GeoHelper.php",
       "classes/detail/parser/DetailParserAddressIdfISO.php",
       "classes/detail/parser/DetailParserMetadataIdfISO.php",
       "classes/detail/parser/DetailParserMetadataIdfUVP.php",
