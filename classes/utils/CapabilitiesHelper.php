@@ -54,8 +54,8 @@ class CapabilitiesHelper
                     }
                     $url .= implode('&', $params);
                 }
-                return $url;
             }
+            return $url;
         }
         return null;
     }
