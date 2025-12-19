@@ -1728,10 +1728,7 @@ class DetailParserMetadataIdfISO
                 if ($serviceUrl) {
                     $serviceType = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceType/*");
                     $serviceVersion = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceTypeVersion/*");
-                    if ((isset($serviceType) && (strtolower(trim($serviceType)) == 'view' || strtolower(trim($serviceType)) == 'wms') || strtolower(trim($serviceType)) == 'wmts') &&
-                        ((str_contains(strtolower($serviceUrl), 'request=getcapabilities') && (str_contains(strtolower($serviceUrl), 'service=wms')) || str_contains(strtolower($serviceUrl), 'service=wmts')) ||
-                            str_contains(strtolower($serviceUrl), 'wmtscapabilities.xml'))
-                    ) {
+                    if ((isset($serviceType) && (strtolower(trim($serviceType)) == 'view' || strtolower(trim($serviceType)) == 'wms') || strtolower(trim($serviceType)) == 'wmts')) {
                         $value = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType);
                     }
                 }
