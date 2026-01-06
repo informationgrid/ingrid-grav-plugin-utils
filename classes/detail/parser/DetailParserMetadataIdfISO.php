@@ -1882,7 +1882,7 @@ class DetailParserMetadataIdfISO
             $tmpSubNodeType = IdfHelper::getNodeValue($tmpNode, './igctx:geometryType/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '';
             $tmpSubNodeName = IdfHelper::getNodeValue($tmpNode, './igctx:geometricFeature/*/igctx:featureName/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '';
             $tmpSubNodeDescription = IdfHelper::getNodeValue($tmpNode, './igctx:geometricFeature/*/igctx:featureDescription/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '';
-            $tmpSubNodeFeatures = IdfHelper::getNodeList($tmpNode, './igctx:geometricFeature/*/igctx:featureAttributes/igctx:FeatureAttributes/igctx:attribute/igctx:OtherFeatureAttribute[./igctx:attributeCode|igctx:attributeContent]') ?? [];
+            $tmpSubNodeFeatures = IdfHelper::getNodeList($tmpNode, './igctx:geometricFeature/*/igctx:featureAttributes/igctx:FeatureAttributes/igctx:attribute/*[./igctx:attributeCode|igctx:attributeContent]') ?? [];
             $features = [];
             foreach ($tmpSubNodeFeatures as $tmpSubNodeFeature) {
                 $features[] = array(
