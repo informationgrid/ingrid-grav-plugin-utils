@@ -1886,7 +1886,7 @@ class DetailParserMetadataIdfISO
             $features = [];
             foreach ($tmpSubNodeFeatures as $tmpSubNodeFeature) {
                 $features[] = array(
-                    'code' => IdfHelper::getNodeValue($tmpSubNodeFeature, './igctx:attributeContent/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '',
+                    'code' => IdfHelper::getNodeValue($tmpSubNodeFeature, './igctx:attributeContent/*[self::gco:CharacterString or self::gmx:Anchor] | ./igctx:attributeCode/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '',
                     'description' => IdfHelper::getNodeValue($tmpSubNodeFeature, './igctx:attributeDescription/*[self::gco:CharacterString or self::gmx:Anchor]') ?? ''
                 );
             }
