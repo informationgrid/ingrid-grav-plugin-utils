@@ -171,6 +171,9 @@ class ElasticsearchService
             } else if (property_exists((object)$facet, 'query')) {
                 if (isset($facet['query']['terms'])) {
                     $result[$facet['id']] = $facet['query'];
+                    if (isset($result[$facet['id']]['terms']['field']) && !isset($result[$facet['id']]['terms']['size'])) {
+                        $result[$facet['id']]['terms']['size'] = 100;
+                    }
                     $result[$facet['id']]['aggs']['final']['filter']['bool']['must'] = [];
                     self::addFilterToFacet($result[$facet['id']]['aggs']['final']['filter']['bool']['must'], $facetConfig, $selectedFacets, $facet['id']);
                 }
