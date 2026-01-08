@@ -16,6 +16,11 @@ class DetailParserMetadataIdfISO
         $metadata->metaClass = self::getType($node);
         $metadata->metaClassName = CodelistHelper::getCodelistEntry(["8000"], $metadata->metaClass, $lang);
 
+        $tmpLangCode = IdfHelper::getNodeValue($node, "./gmd:language/gmd:LanguageCode/@codeListValue");
+        if (isset($tmpLangCode) && $tmpLangCode == 'eng') {
+            $metadata->langCode = 'en';
+        }
+
         $xpathExpression = "./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->title = IdfHelper::getNodeValue($node, $xpathExpression);
 
@@ -36,7 +41,7 @@ class DetailParserMetadataIdfISO
         $metadata->mapUrl = self::getMapUrl($node, $metadata->metaClass);
         $metadata->mapUrlClient = IdfHelper::getNodeValue($node, './idf:mapUrl');
         $metadata->links = self::getLinkRefs($node, $metadata->metaClass, $lang);
-        $metadata->contacts = self::getContactRefs($node, $lang);
+        $metadata->contacts = self::getContactRefs($node, $metadata->langCode ?? $lang);
 
         self::getTimeRefs($node, $metadata, $lang);
         self::getMapRefs($node, $metadata, $lang);
@@ -272,11 +277,11 @@ class DetailParserMetadataIdfISO
         $xpathExpression = "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:endPosition/@indeterminatePosition";
         $metadata->timeFromType = IdfHelper::getNodeValue($node, $xpathExpression);
         $xpathExpression = "./*/*/gmd:status/gmd:MD_ProgressCode/@codeListValue";
-        $metadata->timeStatus = CodelistHelper::getCodelistEntryByIso(["523"], IdfHelper::getNodeValue($node, $xpathExpression), $lang);
+        $metadata->timeStatus = CodelistHelper::getCodelistEntryByIso(["523"], IdfHelper::getNodeValue($node, $xpathExpression), $metadata->langCode ?? $lang);
         $xpathExpression = "./*/*/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation/gmd:maintenanceAndUpdateFrequency/gmd:MD_MaintenanceFrequencyCode/@codeListValue";
-        $metadata->timePeriod = CodelistHelper::getCodelistEntryByIso(["518"], IdfHelper::getNodeValue($node, $xpathExpression), $lang);
+        $metadata->timePeriod = CodelistHelper::getCodelistEntryByIso(["518"], IdfHelper::getNodeValue($node, $xpathExpression), $metadata->langCode ?? $lang);
         $xpathExpression = "./*/*/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation/gmd:userDefinedMaintenanceFrequency/gts:TM_PeriodDuration";
-        $metadata->timeInterval = TMPeriodDurationHelper::transformPeriodDuration(IdfHelper::getNodeValue($node, $xpathExpression), $lang);
+        $metadata->timeInterval = TMPeriodDurationHelper::transformPeriodDuration(IdfHelper::getNodeValue($node, $xpathExpression), $metadata->langCode ?? $lang);
         $xpathExpression = "./*/*/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation/gmd:maintenanceNote/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->timeDescr = IdfHelper::getNodeValue($node, $xpathExpression);
         $xpathExpression = "./*/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'creation']/gmd:date/*[self::gco:Date or self::gco:DateTime]";
@@ -587,8 +592,8 @@ class DetailParserMetadataIdfISO
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
             $cswUrl = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
             $attachedToFieldXPath ="./*/idf:attachedToField[not(@entry-id='9990') and not(@entry-id='3600')]";
-            $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "@list-id");
-            $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "@entry-id");
+            $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@list-id");
+            $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@entry-id");
             if ($attachedToFieldListId && $attachedToFieldEntryId) {
                 $attachedToField = CodelistHelper::getCodelistEntry($attachedToFieldListId, $attachedToFieldEntryId, $lang);
             } else {
@@ -610,7 +615,7 @@ class DetailParserMetadataIdfISO
         }
 
         // Weitere Verweise
-        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/gmd:function/*/@codeListValue='download')][./*]";
+        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/idf:attachedToField[@entry-id='5066']) and not(./*/gmd:function/*/@codeListValue='download')][./*]";
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($tmpNodes as $tmpNode) {
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
@@ -1084,8 +1089,7 @@ class DetailParserMetadataIdfISO
         $metadata->supplementalInformationAbstract = IdfHelper::getNodeValue($node, $xpathExpression);
         $metadata->operations = self::getOperations($node);
 
-        $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL";
-        $metadata->operationConnectPoint = IdfHelper::getNodeValue($node, $xpathExpression);
+        $metadata->operationConnectPoint = self::getConnectPoint($node);
 
         $xpathExpression = "./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->identifierCode = IdfHelper::getNodeValue($node, $xpathExpression);
@@ -1666,7 +1670,7 @@ class DetailParserMetadataIdfISO
     {
         $metadata->modTime = IdfHelper::getNodeValue($node, "./gmd:dateStamp/*[self::gco:Date or self::gco:DateTime or .]");
         $metadata->lang = LanguageHelper::getNameFromIso639_2(IdfHelper::getNodeValue($node, "./gmd:language/gmd:LanguageCode/@codeListValue"), $lang);
-        $metadata->hierarchyLevel = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue", ["525"], $lang);
+        $metadata->hierarchyLevel = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue", ["525"], $metadata->langCode ?? $lang);
         $contact_meta = array(
             "mail" => IdfHelper::getNodeValueList($node, "./gmd:contact/*/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/*[self::gco:CharacterString or self::gmx:Anchor]"),
             "role" => IdfHelper::getNodeValue($node, "./gmd:contact/*/gmd:role/gmd:CI_RoleCode/@codeListValue", ["505"], $lang)
@@ -1898,6 +1902,20 @@ class DetailParserMetadataIdfISO
             );
         }
         return $array;
+    }
+
+    private static function getConnectPoint(\SimpleXMLElement $node): ?string
+    {
+        $xpathExpression = "./gmd:identificationInfo/*/srv:serviceType/gco:LocalName";
+        $serviceType = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/srv:serviceTypeVersion/*[self::gco:CharacterString or self::gmx:Anchor]";
+        $serviceTypeVersion = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor][text() = 'GetCapabilities']/../../srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL";
+        $tmpValue = IdfHelper::getNodeValue($node, $xpathExpression);
+        if (isset($tmpValue) && isset($serviceTypeVersion)) {
+            $tmpValue = CapabilitiesHelper::getCapabilitiesUrl($tmpValue, $serviceTypeVersion, $serviceType);
+        }
+        return $tmpValue;
     }
 
 }
