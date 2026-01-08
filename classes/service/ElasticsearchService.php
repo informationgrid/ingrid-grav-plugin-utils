@@ -196,11 +196,11 @@ class ElasticsearchService
             $tempFilter = array();
             if (count($explodedSelection) > 1) {
                 foreach ($explodedSelection as $item) {
-                    $tempFilter[] = '{ "query_string": { "query":"' . sprintf($foundObject['search'], $item) . '"}}';
+                    $tempFilter[] = '{ "query_string": { "query":"' . sprintf($foundObject['search'], '\"'. $item . '\"') . '"}}';
                 }
                 $filter[] = '{"bool": { "should": [ ' . join(self::$FILTER_QUERY_SEPARATOR, $tempFilter) . ']}}';
             } else {
-                $filter[] = '{ "query_string": { "query":"' . sprintf($foundObject['search'], $explodedSelection[0]) . '"}}';
+                $filter[] = '{ "query_string": { "query":"' . sprintf($foundObject['search'], '\"'. $explodedSelection[0] . '\"') . '"}}';
             }
         } else if (property_exists((object)$foundObject, 'facets')) {
             $values = explode(self::$FACET_ENTRIES_SEPARATOR, $selectionValue);
@@ -317,7 +317,7 @@ class ElasticsearchService
                             if (isset($foundObject['search'])) {
                                 $shouldGroup[] = array(
                                     "query_string" => array(
-                                        "query" => sprintf($foundObject['search'], $value)
+                                        "query" => sprintf($foundObject['search'], '"'. $value . '"')
                                     )
                                 );
                             } else if (isset($foundObject['facets'])) {
