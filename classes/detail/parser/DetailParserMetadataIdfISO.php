@@ -218,6 +218,7 @@ class DetailParserMetadataIdfISO
         $xpathExpression = './idf:additionalDataSection[@id="projectInfo"]';
         $metadata->projectNumber = IdfHelper::getNodeValue($node, $xpathExpression . '/idf:projectNumber');
         $metadata->projectTitle = IdfHelper::getNodeValue($node, $xpathExpression . '/idf:projectTitle');
+        $metadata->hierachyLevelName = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevelName/*[self::gco:CharacterString or self::gmx:Anchor]");
 
         return $metadata;
     }
