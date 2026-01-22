@@ -171,6 +171,9 @@ class ElasticsearchService
             } else if (property_exists((object)$facet, 'query')) {
                 if (isset($facet['query']['terms'])) {
                     $result[$facet['id']] = $facet['query'];
+                    if (isset($result[$facet['id']]['terms']['field']) && !isset($result[$facet['id']]['terms']['size'])) {
+                        $result[$facet['id']]['terms']['size'] = 100;
+                    }
                     $result[$facet['id']]['aggs']['final']['filter']['bool']['must'] = [];
                     self::addFilterToFacet($result[$facet['id']]['aggs']['final']['filter']['bool']['must'], $facetConfig, $selectedFacets, $facet['id']);
                 }
@@ -193,11 +196,18 @@ class ElasticsearchService
             $tempFilter = array();
             if (count($explodedSelection) > 1) {
                 foreach ($explodedSelection as $item) {
-                    $tempFilter[] = '{ "query_string": { "query":' . json_encode(sprintf($foundObject['search'], $item)) . '}}';
+                    if (str_contains($foundObject['search'], '%s')) {
+                        $item = '\"'. $item . '\"';
+                    }
+                    $tempFilter[] = '{ "query_string": { "query":"' . sprintf($foundObject['search'], $item) . '"}}';
                 }
                 $filter[] = '{"bool": { "should": [ ' . join(self::$FILTER_QUERY_SEPARATOR, $tempFilter) . ']}}';
             } else {
-                $filter[] = '{ "query_string": { "query":' . json_encode(sprintf($foundObject['search'], $explodedSelection[0])) . '}}';
+                $tmpValue = $explodedSelection[0];
+                if (str_contains($foundObject['search'], '%s')) {
+                    $tmpValue = '\"'. $tmpValue . '\"';
+                }
+                $filter[] = '{ "query_string": { "query":"' . sprintf($foundObject['search'], $tmpValue) . '"}}';
             }
         } else if (property_exists((object)$foundObject, 'facets')) {
             $values = explode(self::$FACET_ENTRIES_SEPARATOR, $selectionValue);
@@ -312,6 +322,9 @@ class ElasticsearchService
 
                         if ($foundObject) {
                             if (isset($foundObject['search'])) {
+                                if (str_contains($foundObject['search'], '%s')) {
+                                    $value = '"'. $value . '"';
+                                }
                                 $shouldGroup[] = array(
                                     "query_string" => array(
                                         "query" => sprintf($foundObject['search'], $value)

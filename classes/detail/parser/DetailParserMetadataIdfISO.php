@@ -16,6 +16,11 @@ class DetailParserMetadataIdfISO
         $metadata->metaClass = self::getType($node);
         $metadata->metaClassName = CodelistHelper::getCodelistEntry(["8000"], $metadata->metaClass, $lang);
 
+        $tmpLangCode = IdfHelper::getNodeValue($node, "./gmd:language/gmd:LanguageCode/@codeListValue");
+        if (isset($tmpLangCode) && $tmpLangCode == 'eng') {
+            $metadata->langCode = 'en';
+        }
+
         $xpathExpression = "./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->title = IdfHelper::getNodeValue($node, $xpathExpression);
 
@@ -36,7 +41,7 @@ class DetailParserMetadataIdfISO
         $metadata->mapUrl = self::getMapUrl($node, $metadata->metaClass);
         $metadata->mapUrlClient = IdfHelper::getNodeValue($node, './idf:mapUrl');
         $metadata->links = self::getLinkRefs($node, $metadata->metaClass, $lang);
-        $metadata->contacts = self::getContactRefs($node, $lang);
+        $metadata->contacts = self::getContactRefs($node, $metadata->langCode ?? $lang);
 
         self::getTimeRefs($node, $metadata, $lang);
         self::getMapRefs($node, $metadata, $lang);
@@ -213,6 +218,7 @@ class DetailParserMetadataIdfISO
         $xpathExpression = './idf:additionalDataSection[@id="projectInfo"]';
         $metadata->projectNumber = IdfHelper::getNodeValue($node, $xpathExpression . '/idf:projectNumber');
         $metadata->projectTitle = IdfHelper::getNodeValue($node, $xpathExpression . '/idf:projectTitle');
+        $metadata->hierachyLevelName = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevelName/*[self::gco:CharacterString or self::gmx:Anchor]");
 
         return $metadata;
     }
@@ -272,11 +278,11 @@ class DetailParserMetadataIdfISO
         $xpathExpression = "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:endPosition/@indeterminatePosition";
         $metadata->timeFromType = IdfHelper::getNodeValue($node, $xpathExpression);
         $xpathExpression = "./*/*/gmd:status/gmd:MD_ProgressCode/@codeListValue";
-        $metadata->timeStatus = CodelistHelper::getCodelistEntryByIso(["523"], IdfHelper::getNodeValue($node, $xpathExpression), $lang);
+        $metadata->timeStatus = CodelistHelper::getCodelistEntryByIso(["523"], IdfHelper::getNodeValue($node, $xpathExpression), $metadata->langCode ?? $lang);
         $xpathExpression = "./*/*/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation/gmd:maintenanceAndUpdateFrequency/gmd:MD_MaintenanceFrequencyCode/@codeListValue";
-        $metadata->timePeriod = CodelistHelper::getCodelistEntryByIso(["518"], IdfHelper::getNodeValue($node, $xpathExpression), $lang);
+        $metadata->timePeriod = CodelistHelper::getCodelistEntryByIso(["518"], IdfHelper::getNodeValue($node, $xpathExpression), $metadata->langCode ?? $lang);
         $xpathExpression = "./*/*/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation/gmd:userDefinedMaintenanceFrequency/gts:TM_PeriodDuration";
-        $metadata->timeInterval = TMPeriodDurationHelper::transformPeriodDuration(IdfHelper::getNodeValue($node, $xpathExpression), $lang);
+        $metadata->timeInterval = TMPeriodDurationHelper::transformPeriodDuration(IdfHelper::getNodeValue($node, $xpathExpression), $metadata->langCode ?? $lang);
         $xpathExpression = "./*/*/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation/gmd:maintenanceNote/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->timeDescr = IdfHelper::getNodeValue($node, $xpathExpression);
         $xpathExpression = "./*/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'creation']/gmd:date/*[self::gco:Date or self::gco:DateTime]";
@@ -587,8 +593,8 @@ class DetailParserMetadataIdfISO
             $description = IdfHelper::getNodeValue($tmpNode, "./*/gmd:description/*[self::gco:CharacterString or self::gmx:Anchor]");
             $cswUrl = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
             $attachedToFieldXPath ="./*/idf:attachedToField[not(@entry-id='9990') and not(@entry-id='3600')]";
-            $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "@list-id");
-            $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "@entry-id");
+            $attachedToFieldListId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@list-id");
+            $attachedToFieldEntryId = IdfHelper::getNodeValue($tmpNode, $attachedToFieldXPath . "/@entry-id");
             if ($attachedToFieldListId && $attachedToFieldEntryId) {
                 $attachedToField = CodelistHelper::getCodelistEntry($attachedToFieldListId, $attachedToFieldEntryId, $lang);
             } else {
@@ -610,7 +616,7 @@ class DetailParserMetadataIdfISO
         }
 
         // Weitere Verweise
-        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/gmd:function/*/@codeListValue='download')][./*]";
+        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/idf:attachedToField[@entry-id='5066']) and not(./*/gmd:function/*/@codeListValue='download')][./*]";
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($tmpNodes as $tmpNode) {
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
@@ -1084,8 +1090,7 @@ class DetailParserMetadataIdfISO
         $metadata->supplementalInformationAbstract = IdfHelper::getNodeValue($node, $xpathExpression);
         $metadata->operations = self::getOperations($node);
 
-        $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL";
-        $metadata->operationConnectPoint = IdfHelper::getNodeValue($node, $xpathExpression);
+        $metadata->operationConnectPoint = self::getConnectPoint($node);
 
         $xpathExpression = "./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]";
         $metadata->identifierCode = IdfHelper::getNodeValue($node, $xpathExpression);
@@ -1666,7 +1671,7 @@ class DetailParserMetadataIdfISO
     {
         $metadata->modTime = IdfHelper::getNodeValue($node, "./gmd:dateStamp/*[self::gco:Date or self::gco:DateTime or .]");
         $metadata->lang = LanguageHelper::getNameFromIso639_2(IdfHelper::getNodeValue($node, "./gmd:language/gmd:LanguageCode/@codeListValue"), $lang);
-        $metadata->hierarchyLevel = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue", ["525"], $lang);
+        $metadata->hierarchyLevel = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue", ["525"], $metadata->langCode ?? $lang);
         $contact_meta = array(
             "mail" => IdfHelper::getNodeValueList($node, "./gmd:contact/*/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/*[self::gco:CharacterString or self::gmx:Anchor]"),
             "role" => IdfHelper::getNodeValue($node, "./gmd:contact/*/gmd:role/gmd:CI_RoleCode/@codeListValue", ["505"], $lang)
@@ -1728,10 +1733,7 @@ class DetailParserMetadataIdfISO
                 if ($serviceUrl) {
                     $serviceType = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceType/*");
                     $serviceVersion = IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/srv:serviceTypeVersion/*");
-                    if ((isset($serviceType) && (strtolower(trim($serviceType)) == 'view' || strtolower(trim($serviceType)) == 'wms') || strtolower(trim($serviceType)) == 'wmts') &&
-                        ((str_contains(strtolower($serviceUrl), 'request=getcapabilities') && (str_contains(strtolower($serviceUrl), 'service=wms')) || str_contains(strtolower($serviceUrl), 'service=wmts')) ||
-                            str_contains(strtolower($serviceUrl), 'wmtscapabilities.xml'))
-                    ) {
+                    if ((isset($serviceType) && (strtolower(trim($serviceType)) == 'view' || strtolower(trim($serviceType)) == 'wms') || strtolower(trim($serviceType)) == 'wmts')) {
                         $value = CapabilitiesHelper::getMapUrl($serviceUrl, $serviceVersion, $serviceType);
                     }
                 }
@@ -1802,7 +1804,8 @@ class DetailParserMetadataIdfISO
         $xpathExpression = './gmd:identificationInfo/*/gmd:pointOfContact/idf:idfResponsibleParty[./gmd:role/gmd:CI_RoleCode/@codeListValue="author"]';
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         if (!empty($tmpNodes)) {
-            return array(
+            $array = [];
+            $array[] = array(
                 "author_person" => IdfHelper::getNodeValueList($node, "./gmd:identificationInfo/*/gmd:pointOfContact/idf:idfResponsibleParty[./gmd:role/gmd:CI_RoleCode/@codeListValue='author']/gmd:individualName/*[self::gco:CharacterString or self::gmx:Anchor]"),
                 "author_org" => IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/gmd:pointOfContact/idf:idfResponsibleParty[./gmd:role/gmd:CI_RoleCode/@codeListValue='author']/gmd:organisationName/*[self::gco:CharacterString or self::gmx:Anchor]"),
                 "year" => IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[./gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication']/gmd:date/gco:Date|./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[./gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication']/gmd:date/gco:DateTime"),
@@ -1811,6 +1814,7 @@ class DetailParserMetadataIdfISO
                 "doi" => IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor][contains(text(),'doi')]"),
                 "doi_type" => IdfHelper::getNodeValue($node, "./gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier[contains(./gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]/text(),'doi')]/gmd:authority/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]")
             );
+            return $array;
         }
         return null;
     }
@@ -1820,14 +1824,18 @@ class DetailParserMetadataIdfISO
         $xpathExpression = './gmd:identificationInfo/*/gmd:aggregationInfo/gmd:MD_AggregateInformation[./gmd:associationType/gmd:DS_AssociationTypeCode/@codeListValue="crossReference"]';
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         if (!empty($tmpNodes)) {
-            return array(
-                "author_person" => IdfHelper::getNodeValueList($node, "./gmd:CI_ResponsibleParty[./gmd:role/gmd:CI_RoleCode/@codeListValue='author']/gmd:individualName/*[self::gco:CharacterString or self::gmx:Anchor]"),
-                "author_org" => IdfHelper::getNodeValue($node, "./gmd:MD_AggregateInformation/gmd:aggregateDataSetName/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty[./gmd:role/gmd:CI_RoleCode/@codeListValue='author']/gmd:organisationName/*[self::gco:CharacterString or self::gmx:Anchor]"),
-                "year" => IdfHelper::getNodeValue($node, "./gmd:MD_AggregateInformation/gmd:aggregateDataSetName/gmd:CI_Citation/gmd:date/gmd:CI_Date[./gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication']/gmd:date/gco:Date"),
-                "title" => IdfHelper::getNodeValue($node, "./gmd:MD_AggregateInformation/gmd:aggregateDataSetName/gmd:CI_Citation/gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]"),
-                "publisher" => IdfHelper::getNodeValue($node, "./gmd:MD_AggregateInformation/gmd:aggregateDataSetName/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty[./gmd:role/gmd:CI_RoleCode/@codeListValue='publisher'][1]/gmd:organisationName/*[self::gco:CharacterString or self::gmx:Anchor]"),
-                "doi" => IdfHelper::getNodeValue($node, "./gmd:MD_AggregateInformation/gmd:aggregateDataSetName/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]")
-            );
+            $array = [];
+            foreach ($tmpNodes as $tmpNode) {
+                $array[] = array(
+                    "author_person" => IdfHelper::getNodeValueList($tmpNode, "./gmd:aggregateDataSetName/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty[./gmd:role/gmd:CI_RoleCode/@codeListValue='author']/gmd:individualName/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                    "author_org" => IdfHelper::getNodeValue($tmpNode, "./gmd:aggregateDataSetName/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty[./gmd:role/gmd:CI_RoleCode/@codeListValue='author']/gmd:organisationName/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                    "year" => IdfHelper::getNodeValue($tmpNode, "./gmd:aggregateDataSetName/gmd:CI_Citation/gmd:date/gmd:CI_Date[./gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='publication']/gmd:date/gco:Date"),
+                    "title" => IdfHelper::getNodeValue($tmpNode, "./gmd:aggregateDataSetName/gmd:CI_Citation/gmd:title/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                    "publisher" => IdfHelper::getNodeValue($tmpNode, "./gmd:aggregateDataSetName/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty[./gmd:role/gmd:CI_RoleCode/@codeListValue='publisher'][1]/gmd:organisationName/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                    "doi" => IdfHelper::getNodeValue($tmpNode, "./gmd:aggregateDataSetName/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]")
+                );
+            }
+            return $array;
         }
         return null;
     }
@@ -1885,11 +1893,11 @@ class DetailParserMetadataIdfISO
             $tmpSubNodeType = IdfHelper::getNodeValue($tmpNode, './igctx:geometryType/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '';
             $tmpSubNodeName = IdfHelper::getNodeValue($tmpNode, './igctx:geometricFeature/*/igctx:featureName/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '';
             $tmpSubNodeDescription = IdfHelper::getNodeValue($tmpNode, './igctx:geometricFeature/*/igctx:featureDescription/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '';
-            $tmpSubNodeFeatures = IdfHelper::getNodeList($tmpNode, './igctx:geometricFeature/*/igctx:featureAttributes/igctx:FeatureAttributes/igctx:attribute/igctx:OtherFeatureAttribute[./igctx:attributeCode|igctx:attributeContent]') ?? [];
+            $tmpSubNodeFeatures = IdfHelper::getNodeList($tmpNode, './igctx:geometricFeature/*/igctx:featureAttributes/igctx:FeatureAttributes/igctx:attribute/*[./igctx:attributeCode|igctx:attributeContent]') ?? [];
             $features = [];
             foreach ($tmpSubNodeFeatures as $tmpSubNodeFeature) {
                 $features[] = array(
-                    'code' => IdfHelper::getNodeValue($tmpSubNodeFeature, './igctx:attributeContent/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '',
+                    'code' => IdfHelper::getNodeValue($tmpSubNodeFeature, './igctx:attributeContent/*[self::gco:CharacterString or self::gmx:Anchor] | ./igctx:attributeCode/*[self::gco:CharacterString or self::gmx:Anchor]') ?? '',
                     'description' => IdfHelper::getNodeValue($tmpSubNodeFeature, './igctx:attributeDescription/*[self::gco:CharacterString or self::gmx:Anchor]') ?? ''
                 );
             }
@@ -1901,6 +1909,20 @@ class DetailParserMetadataIdfISO
             );
         }
         return $array;
+    }
+
+    private static function getConnectPoint(\SimpleXMLElement $node): ?string
+    {
+        $xpathExpression = "./gmd:identificationInfo/*/srv:serviceType/gco:LocalName";
+        $serviceType = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/srv:serviceTypeVersion/*[self::gco:CharacterString or self::gmx:Anchor]";
+        $serviceTypeVersion = IdfHelper::getNodeValue($node, $xpathExpression);
+        $xpathExpression = "./gmd:identificationInfo/*/srv:containsOperations/srv:SV_OperationMetadata/srv:operationName/*[self::gco:CharacterString or self::gmx:Anchor][text() = 'GetCapabilities']/../../srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL";
+        $tmpValue = IdfHelper::getNodeValue($node, $xpathExpression);
+        if (isset($tmpValue) && isset($serviceTypeVersion)) {
+            $tmpValue = CapabilitiesHelper::getCapabilitiesUrl($tmpValue, $serviceTypeVersion, $serviceType);
+        }
+        return $tmpValue;
     }
 
 }
