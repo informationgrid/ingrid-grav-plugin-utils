@@ -865,6 +865,7 @@ class DetailParserMetadataIdfISO
         $config = Grav::instance()['config'];
         $theme = $config->get('system.pages.theme');
         $displayUseConstraintsJson = $config->get('themes.' . $theme . '.hit_detail.display_use_constraints_json') ?? true;
+        $removeUseConstraintsPrefix = $config->get('themes.' . $theme . '.hit_detail.remove_use_constraints_prefix') ?? false;
 
         $array = [];
         $constraints = [];
@@ -892,7 +893,9 @@ class DetailParserMetadataIdfISO
             foreach ($values as $value) {
                 $exists = false;
                 foreach ($constraints as $constraint) {
-                    //$value = str_replace('Quellenvermerk: ', '', $value);
+                    if ($removeUseConstraintsPrefix) {
+                        $value = str_replace('Quellenvermerk: ', '', $values);
+                    }
                     if (str_contains($constraint, $value) or str_contains($constraint, "\"" . $value . "\"")) {
                         $exists = true;
                         break;
