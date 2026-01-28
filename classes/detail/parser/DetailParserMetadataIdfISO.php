@@ -870,37 +870,43 @@ class DetailParserMetadataIdfISO
         $constraints = [];
         $restriction = null;
 
-        $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints[./gmd:useConstraints]/*");
+        $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints[./gmd:useConstraints]");
         if ($displayUseConstraintsJson) {
             foreach ($nodes as $tmpNode) {
-                $restriction = IdfHelper::getNodeValue($tmpNode, "./gmd:MD_RestrictionCode[not(contains(@codeListValue, 'otherRestrictions'))]", ["524"], $lang);
-
-                $values = IdfHelper::getNodeValueList($tmpNode, "./*[self::gco:CharacterString or self::gmx:Anchor][starts-with(text(),'{')]");
+                $restriction = IdfHelper::getNodeValue($tmpNode, "./gmd:useConstraints/gmd:MD_RestrictionCode[not(@codeListValue='otherRestrictions')]/@codeListValue", ["524"], $lang);
+                $values = IdfHelper::getNodeValueList($tmpNode, "./*/*[self::gco:CharacterString or self::gmx:Anchor][starts-with(text(),'{')]");
                 foreach ($values as $value) {
-                    $constraints[] = self::removeConstraintPrefix($value);
+                    $constraint = self::removeConstraintPrefix($value);
+                    if ($restriction) {
+                        $constraint = $restriction . ": " . $constraint;
+                        $restriction = null;
+                    }
+                    $constraints[] = $constraint;
                 }
             }
         }
         foreach ($nodes as $tmpNode) {
-            $restriction = IdfHelper::getNodeValue($tmpNode, "./gmd:MD_RestrictionCode[not(contains(@codeListValue, 'otherRestrictions'))]", ["524"], $lang);
+            $restriction = IdfHelper::getNodeValue($tmpNode, "./gmd:useConstraints/gmd:MD_RestrictionCode[not(@codeListValue='otherRestrictions')]/@codeListValue", ["524"], $lang);
 
-            $values = IdfHelper::getNodeValueList($tmpNode, "./*[self::gco:CharacterString or self::gmx:Anchor][not(starts-with(text(),'{'))]");
+            $values = IdfHelper::getNodeValueList($tmpNode, "./*/*[self::gco:CharacterString or self::gmx:Anchor][not(starts-with(text(),'{'))]");
             foreach ($values as $value) {
                 $exists = false;
                 foreach ($constraints as $constraint) {
-                    $value = str_replace('Quellenvermerk: ', '', $value);
+                    //$value = str_replace('Quellenvermerk: ', '', $value);
                     if (str_contains($constraint, $value) or str_contains($constraint, "\"" . $value . "\"")) {
                         $exists = true;
                         break;
                     }
                 }
                 if(!$exists) {
-                    $constraints[] = self::removeConstraintPrefix($value);
+                    $constraint = self::removeConstraintPrefix($value);
+                    if ($restriction) {
+                        $constraint = $restriction . ": " . $constraint;
+                        $restriction = null;
+                    }
+                    $constraints[] = $constraint;
                 }
             }
-        }
-        if (isset($restriction)) {
-            $array['restriction'] = $restriction;
         }
         if (!empty($constraints)) {
             $array['constraints'] = $constraints;
