@@ -45,9 +45,9 @@ class IdfHelper
                     if ($codelistValue == null) {
                         $codelistValue = CodelistHelper::getCodelistEntryByData($codelist, $value, $lang);
                     }
-                    return $codelistValue ?? $value;
+                    return trim($codelistValue ?? $value);
                 }
-                return $value;
+                return trim($value);
             }
         }
         return null;
@@ -95,9 +95,9 @@ class IdfHelper
                     if ($codelistValue == null) {
                         $codelistValue = $value;
                     }
-                    $array[] = $codelistValue;
+                    $array[] = trim($codelistValue);
                 } else {
-                    $array[] = $value;
+                    $array[] = trim($value);
                 }
             }
         }
@@ -146,10 +146,10 @@ class IdfHelper
                 if ($codelist && $lang) {
                     $codelistValue = CodelistHelper::getCodelistEntryByCompare($codelist, $value, $lang, $addEqual);
                     if ($codelistValue) {
-                        $array[] = $codelistValue;
+                        $array[] = trim($codelistValue);
                     }
                 } else {
-                    $array[] = $value;
+                    $array[] = trim($value);
                 }
             }
         }
