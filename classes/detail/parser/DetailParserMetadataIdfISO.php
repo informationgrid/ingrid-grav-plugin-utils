@@ -869,7 +869,6 @@ class DetailParserMetadataIdfISO
 
         $array = [];
         $constraints = [];
-        $restriction = null;
 
         $nodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints[./gmd:useConstraints]");
         if ($displayUseConstraintsJson) {
@@ -896,9 +895,21 @@ class DetailParserMetadataIdfISO
                     if ($removeUseConstraintsPrefix) {
                         $value = str_replace('Quellenvermerk: ', '', $value);
                     }
-                    if (str_contains($constraint, $value) or str_contains($constraint, "\"" . $value . "\"")) {
-                        $exists = true;
-                        break;
+                    $jsonConstraint = json_decode($constraint);
+                    if ($jsonConstraint) {
+                        if ((isset($jsonConstraint->name) and str_contains($value, $jsonConstraint->name)) or
+                            (isset($jsonConstraint->quelle) and str_contains($value, $jsonConstraint->quelle))
+                        ) {
+                            $exists = true;
+                            break;
+                        }
+                    } else {
+                        if (str_contains($constraint, $value) or
+                            str_contains($constraint, "\"" . $value . "\"")
+                        ) {
+                            $exists = true;
+                            break;
+                        }
                     }
                 }
                 if(!$exists) {
