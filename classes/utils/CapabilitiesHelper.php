@@ -17,25 +17,23 @@ class CapabilitiesHelper
                 }
             }
 
+            if (!isset($service)) {
+                if (isset($serviceType)) {
+                    $codelistValue = CodelistHelper::getCodelistEntryByIso(['5100'], $serviceType, 'de');
+                    if (empty($codelistValue)) {
+                        $service = $serviceType;
+                    }
+                }
+            }
+
             if (isset($service) && str_contains($service, " ")) {
                 return $url;
             }
 
-            if (strpos($url, '?')) {
+            if (!strpos($url, '?')) {
                 if (!isset($service)) {
-                    if (isset($serviceType)) {
-                        $codelistValue = CodelistHelper::getCodelistEntryByIso(['5100'], $serviceType, 'de');
-                        if (empty($codelistValue)) {
-                            $service = $serviceType;
-                        }
-                    }
+                    $service = 'WMTS';
                 }
-            } else {
-                $service = 'WMTS';
-            }
-
-            if (!isset($service) && isset($serviceType) && $serviceType === "view") {
-                $service = 'WMS';
             }
 
             if (isset($service)) {
@@ -72,26 +70,24 @@ class CapabilitiesHelper
                 }
             }
 
-            if (strpos($url, '?')) {
-                if (isset($service)) {
-                    if (isset($serviceType)) {
-                        $codelistValue = CodelistHelper::getCodelistEntryByIso(['5100'], $serviceType, 'de');
-                        if (empty($codelistValue)) {
-                            $service = $serviceType;
-                        }
+            if (!isset($service)) {
+                if (isset($serviceType)) {
+                    $codelistValue = CodelistHelper::getCodelistEntryByIso(['5100'], $serviceType, 'de');
+                    if (empty($codelistValue)) {
+                        $service = $serviceType;
                     }
                 }
-            } else {
-                $service = 'WMTS';
+            }
+
+            if (!strpos($url, '?')) {
+                if (!isset($service)) {
+                    $service = 'WMTS';
+                }
             }
 
             $config = Grav::instance()['config'];
             $theme = $config->get('system.pages.theme');
             $is_masterportal = $config->get('themes.' . $theme . '.map.is_masterportal');
-
-            if (!isset($service) && isset($serviceType) && $serviceType === "view") {
-                $service = 'WMS';
-            }
 
             if ($is_masterportal) {
                 if (isset($service)) {
