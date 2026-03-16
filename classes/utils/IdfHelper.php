@@ -126,6 +126,11 @@ class IdfHelper
                                 "type" => $subTypes[$key] ?? 'text'
                             );
                         }
+                    } else {
+                        $item[] = array(
+                            "value" => "",
+                            "type" => 'text'
+                        );
                     }
                 }
                 if (!empty($item)) {
