@@ -46,7 +46,7 @@ class ElasticsearchService
         );
         if ($sortByDate) {
             $sortQuery = array(
-                "t01_object.mod_time" => array(
+                "modified" => array(
                     "order" => "desc"
                 )
             );

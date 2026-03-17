@@ -417,7 +417,7 @@ class CountryHelper
         574 => "Norfolkinsel",
         578 => "Norwegen",
         512 => "Oman",
-        40 =>	 "\u00d6sterreich",
+        40 => "\u00d6sterreich",
         626 => "Osttimor (Timor-Leste)",
         586 => "Pakistan",
         275 => "Pal\u00e4stinensische Autonomiegebiete",
@@ -764,6 +764,19 @@ class CountryHelper
                 } else {
                     $name = self::$countryCodelist_de[$igeCode];
                 }
+            }
+        }
+        return $name;
+    }
+
+    public static function getNameFromNumber(int $value, string $lang): string
+    {
+        $name = $value;
+        if ($lang) {
+            if ($lang == 'en') {
+                $name = self::$countryCodelist_en[$value];
+            } else {
+                $name = self::$countryCodelist_de[$value];
             }
         }
         return $name;

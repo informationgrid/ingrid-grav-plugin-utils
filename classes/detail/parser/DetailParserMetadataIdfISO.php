@@ -149,8 +149,8 @@ class DetailParserMetadataIdfISO
         $polygonGeojsons = [];
         foreach ($polygons as $polygon) {
             if (isset($polygon)) {
-                $polygonWkts[] = IdfHelper::transformGML($polygon, 'wkt');
-                $polygonGeojsons[] = IdfHelper::transformGML($polygon, 'geojson');
+                $polygonWkts[] = GeoHelper::transformGML($polygon, 'wkt');
+                $polygonGeojsons[] = GeoHelper::transformGML($polygon, 'geojson');
             }
         }
         $metadata->polygonWkts = $polygonWkts;
