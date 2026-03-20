@@ -87,7 +87,9 @@ class CodelistIndex
                 self::arrayToXml($value, $label);
             }
             else {
-                $xml->addChild($key, $value);
+                if (!empty($key)) {
+                    $xml->addChild($key, $value);
+                }
             }
         }
     }
