@@ -33,15 +33,18 @@ class DetailParserMetadataIdfUVP
         $value = IdfHelper::getNodeValue($node, './spatialValue');
         if (isset($value)) {
             $values = explode(':', $value);
-            if (!str_contains($values[1], 'null')) {
-                $coords = explode(', ', $values[1]);
-                $array[] = array(
-                    "title" => empty($values[0]) ? $title : $values[0],
-                    "westBoundLongitude" => (float)$coords[0],
-                    "southBoundLatitude" => (float)$coords[1],
-                    "eastBoundLongitude" => (float)$coords[2],
-                    "northBoundLatitude" => (float)$coords[3],
-                );
+            $countValues = count($values);
+            if (!empty($countValues)) {
+                if (!str_contains($values[$countValues - 1], 'null')) {
+                    $coords = explode(', ', $values[$countValues - 1]);
+                    $array[] = array(
+                        "title" => empty($values[0]) ? $title : $values[0],
+                        "westBoundLongitude" => (float)$coords[0],
+                        "southBoundLatitude" => (float)$coords[1],
+                        "eastBoundLongitude" => (float)$coords[2],
+                        "northBoundLatitude" => (float)$coords[3],
+                    );
+                }
             }
         }
         return $array;
