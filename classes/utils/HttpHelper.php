@@ -8,12 +8,16 @@ class HttpHelper
 {
     public static function getHeader(string $url): array
     {
+        $grav = Grav::instance();
+        $httpPluginConfig = $grav['config']->get('plugins.ingrid-grav-utils.http');
+        $httpPluginConfigHeaderTimeout = $httpPluginConfig['header.timeout'] ?? 3;
+
         DebugHelper::debug('Get header for: ' . $url);
         $client = new Client();
         $clientOptions = [
-            'connect_timeout' => 10
+            'connect_timeout' => $httpPluginConfigHeaderTimeout
         ];
-        $httpConfig = Grav::instance()['config']->get('system.http');
+        $httpConfig = $grav['config']->get('system.http');
         $httpConfigProxyUrl = $httpConfig['proxy_url'];
         if (!empty($httpConfigProxyUrl)) {
             $clientOptions['proxy'] = [

@@ -47,6 +47,13 @@ en:
       INDEXING_RSS_EMPTY: Index not created.
       INDEXING_UNPERMISSION: Insufficient permissions to reindex the search engine database.
       GRAV_MENU_TEXT: Reindexing RSS
+    HTTP:
+      TITLE: HTTP
+      HEADER:
+        TIMEOUT:
+          LABEL: Timeout Header Anfrage
+          HELP: Legen Sie den Timeout für die Header Anfrage fest.
+
 de:
   PLUGIN_INGRID_GRAV_UTILS:
     DEBUG:
@@ -96,3 +103,9 @@ de:
       INDEXING_RSS_EMPTY: Noch nicht indexiert.
       INDEXING_UNPERMISSION: Unzureichende Berechtigungen zum Neuindizieren.
       GRAV_MENU_TEXT: RSS (re)indexieren
+    HTTP:
+      TITLE: HTTP
+      HEADER:
+        TIMEOUT:
+          LABEL: Timeout Header Anfrage
+          HELP: Legen Sie den Timeout für die Header Anfrage fest.

@@ -17,3 +17,6 @@ rss:
     enabled: true
     at: '*/15 * * * *'
     logs: logs/ingrid-rss-index.out
+http:
+  header:
+    timeout: 3
