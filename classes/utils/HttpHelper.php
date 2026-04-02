@@ -8,11 +8,19 @@ class HttpHelper
 {
     public static function getHeader(string $url): array
     {
+        DebugHelper::debug('Get header for: ' . $url);
         $grav = Grav::instance();
+        $response = [false, false];
+        $cache = $grav['cache'];
+        $cacheId = md5('HttpHelper.getHeader_' . $url);
+
+        if ($items = $cache->fetch($cacheId)) {
+            return $items;
+        }
+
         $httpPluginConfig = $grav['config']->get('plugins.ingrid-grav-utils.http');
         $httpPluginConfigHeaderTimeout = $httpPluginConfig['header.timeout'] ?? 3;
 
-        DebugHelper::debug('Get header for: ' . $url);
         $client = new Client();
         $clientOptions = [
             'connect_timeout' => $httpPluginConfigHeaderTimeout
@@ -35,24 +43,26 @@ class HttpHelper
                 try {
                     $res = $client->request('GET', $url, $clientOptions);
                 } catch (GuzzleException $e) {
-                    return [false, false];
+                    DebugHelper::debug('Error get http content for: ' . $url);
                 }
             }
         }
         if ($res) {
-            return [$res->getStatusCode(), $res->getHeaders()];
+            $response = [$res->getStatusCode(), $res->getHeaders()];
         }
-        return [false, false];
+        $cache->save($cacheId, $response);
+        return $response;
     }
 
     public static function getHttpContent(string $url): string|bool
     {
         DebugHelper::debug('Get http content for: ' . $url);
+        $grav = Grav::instance();
         $client = new Client();
         $clientOptions = [
             'connect_timeout' => 10
         ];
-        $httpConfig = Grav::instance()['config']->get('system.http');
+        $httpConfig = $grav['config']->get('system.http');
         $httpConfigProxyUrl = $httpConfig['proxy_url'];
         if (!empty($httpConfigProxyUrl)) {
             $clientOptions['proxy'] = [
@@ -91,4 +101,5 @@ class HttpHelper
         fclose($remoteFile);
         return $content;
     }
+
 }
