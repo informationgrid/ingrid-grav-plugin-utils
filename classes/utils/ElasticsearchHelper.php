@@ -147,4 +147,17 @@ class ElasticsearchHelper
         }
         return $array;
     }
+
+    public static function isCurrentIndexFormat(\stdClass $esHit): bool
+    {
+        if ((self::getValue($esHit, 'x1') && self::getValue($esHit, 'y1')) ||
+            (self::getValueArray($esHit, 't04_search.searchterm')) ||
+            (self::getValue($esHit, 'additional_html_1')) ||
+            (self::getValue($esHit, 'created')) ||
+            (in_array("www", self::getValueArray($esHit, "datatype")))
+        ) {
+            return true;
+        }
+        return false;
+    }
 }
