@@ -150,11 +150,14 @@ class ElasticsearchHelper
 
     public static function isCurrentIndexFormat(\stdClass $esHit): bool
     {
-        if ((self::getValue($esHit, 'x1') && self::getValue($esHit, 'y1')) ||
+        if (
+            (in_array("www", self::getValueArray($esHit, "datatype"))) ||
+            (in_array("address", self::getValueArray($esHit, "datatype"))) ||
+            (in_array("IDF_1.0", self::getValueArray($esHit, "datatype"))) ||
+            (self::getValue($esHit, 'x1') && self::getValue($esHit, 'y1')) ||
             (self::getValueArray($esHit, 't04_search.searchterm')) ||
             (self::getValue($esHit, 'additional_html_1')) ||
-            (self::getValue($esHit, 'created')) ||
-            (in_array("www", self::getValueArray($esHit, "datatype")))
+            (self::getValue($esHit, 'created'))
         ) {
             return true;
         }
