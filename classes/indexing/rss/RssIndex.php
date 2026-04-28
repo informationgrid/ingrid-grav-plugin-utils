@@ -25,7 +25,6 @@ class RssIndex
         foreach ($array as $key => $val) {
             #storing the key of the names array as the Name key of the arr
             $names[$key] = $val['date_ms'];
-
         }
         array_multisort($names, SORT_DESC, $array);
         $result = array(
@@ -115,11 +114,14 @@ class RssIndex
                             }
                         }
                     }
+                } else {
+                    DebugHelper::error('Error load RSS-URL (load xml return false): ' . $url);
                 }
             } else {
-                DebugHelper::error('Error load RSS-URL: ' . $url);
+                DebugHelper::error('Error load RSS-URL (response return false): ' . $url);
             }
         } catch (Exception $e) {
+            DebugHelper::error('Error load RSS-URL: ' . $url . ' - ' . $e->getMessage());
         }
     }
 
