@@ -27,10 +27,12 @@ class HttpHelper
         ];
         $httpConfig = $grav['config']->get('system.http');
         $httpConfigProxyUrl = $httpConfig['proxy_url'];
+        $httpConfigProxyNo = $httpConfig['proxy_no'];
         if (!empty($httpConfigProxyUrl)) {
             $clientOptions['proxy'] = [
                 'http' => $httpConfigProxyUrl,
                 'https' => $httpConfigProxyUrl,
+                'no' => $httpConfigProxyNo
             ];
         }
         $res = null;
@@ -64,10 +66,12 @@ class HttpHelper
         ];
         $httpConfig = $grav['config']->get('system.http');
         $httpConfigProxyUrl = $httpConfig['proxy_url'];
+        $httpConfigProxyNo = $httpConfig['proxy_no'];
         if (!empty($httpConfigProxyUrl)) {
             $clientOptions['proxy'] = [
                 'http' => $httpConfigProxyUrl,
                 'https' => $httpConfigProxyUrl,
+                'no' => $httpConfigProxyNo
             ];
         }
         try {
