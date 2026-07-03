@@ -115,6 +115,15 @@ class CapabilitiesHelper
                     }
                 }
             } else {
+                if (!isset($service) and isset($serviceType)) {
+                    if ($serviceType == 'view') {
+                        if (str_contains(strtolower($url), 'wms')) {
+                            $service = 'WMS';
+                        } elseif (str_contains(strtolower($url), 'wmts')) {
+                            $service = 'WMTS';
+                        }
+                    }
+                }
                 if (isset($service)) {
                     if (str_contains('?', $url)) {
                         $params = [];
