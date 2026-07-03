@@ -292,6 +292,19 @@ class DetailParserMetadataIdfISO
 
             $array[] = $item;
         }
+        $tmpNodes = IdfHelper::getNodeList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/*[not(following-sibling::gmd:geographicElement/gmd:EX_GeographicBoundingBox)]/gmd:EX_GeographicDescription[./*]");
+        foreach ($tmpNodes as $tmpNode) {
+            $item = [];
+            $title = IdfHelper::getNodeValue($tmpNode, "./gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/gco:CharacterString");
+            if (isset($title)) {
+                $item[] = array(
+                    "value" => IdfHelper::getNodeValue($tmpNode, "./gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/gco:CharacterString") ?? '',
+                    "type" => "text"
+                );
+
+                $array[] = $item;
+            }
+        }
         return $array;
     }
 
