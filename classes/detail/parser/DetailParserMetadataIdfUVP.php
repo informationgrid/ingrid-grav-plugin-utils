@@ -66,6 +66,8 @@ class DetailParserMetadataIdfUVP
                 $considerationDocs = self::getDocs($tmpNode, './docs[@type="considerationDocs"]/doc');
                 $approvalDocs = self::getDocs($tmpNode, './docs[@type="approvalDocs"]/doc');
                 $designDocs = self::getDocs($tmpNode, './docs[@type="designDocs"]/doc');
+                $scopingDateDocs = self::getDocs($tmpNode, './docs[@type="scopingDateDocs"]/doc');
+                $scopingGeneralDocs = self::getDocs($tmpNode, './docs[@type="scopingGeneralDocs"]/doc');
                 $item = array(
                     'type' => $type,
                     'dateFrom' => $dateFrom,
@@ -78,6 +80,8 @@ class DetailParserMetadataIdfUVP
                     'considerationDocs' => $considerationDocs,
                     'approvalDocs' => $approvalDocs,
                     'designDocs' => $designDocs,
+                    'scopingDateDocs' => $scopingDateDocs,
+                    'scopingGeneralDocs' => $scopingGeneralDocs,
                 );
                 $array[] = $item;
             }
