@@ -59,6 +59,8 @@ class Detail
 
     public string $category;
 
+    public string $category_name;
+
     public ?string $import_date;
 
     public ?string $modified_date;

@@ -50,6 +50,7 @@ class BipuDetailParser
         $detail->subtopic = $umweltnavi->topic_hierarchy?->subtopics[0] ?? null;
         $detail->selectcategory = $umweltnavi->topic_hierarchy?->selectcategory ?? null;
         $detail->category = $umweltnavi->category->slug;
+        $detail->category_name = $umweltnavi->category->name;
 
         $detail->import_date = $metadata?->created ?? null;
         $detail->modified_date = $metadata?->modified ?? null;
