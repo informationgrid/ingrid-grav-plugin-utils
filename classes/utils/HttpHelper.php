@@ -6,13 +6,20 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class HttpHelper
 {
-    public static function getHeader(string $url): array
+    public static function getHeader(string $url): array {
+        return self::getHeaderWithHash($url, null);
+    }
+
+    public static function getHeaderWithHash(string $url, ?string $hash): array
     {
         DebugHelper::debug('Get header for: ' . $url);
         $grav = Grav::instance();
         $response = [false, false];
         $cache = $grav['cache'];
-        $cacheId = md5('HttpHelper.getHeader_' . $url);
+        if (!isset($hash)) {
+            $hash = '';
+        }
+        $cacheId = md5('HttpHelper.getHeader_' . $hash . '_'. $url);
 
         if ($items = $cache->fetch($cacheId)) {
             return $items;
