@@ -9,7 +9,7 @@ class DetailParserMetadataIdfUVP
 {
     static string $xPathStringLength = '[string-length(text()) > 0]';
 
-    public static function parse(\SimpleXMLElement $node, string $uuid, ?string $dataSourceName, array $providers, string $lang): DetailMetadataUVP
+    public static function parse(\SimpleXMLElement $node, string $uuid, ?string $dataSourceName, array $providers, string $lang, ?string $timestamp): DetailMetadataUVP
     {
         $metadata = new DetailMetadataUVP($uuid);
         $metadata->parentUuid = IdfHelper::getNodeValue($node, "./parent_id" . self::$xPathStringLength);
@@ -19,8 +19,8 @@ class DetailParserMetadataIdfUVP
         $metadata->summary = IdfHelper::getNodeValue($node, "./descr" . self::$xPathStringLength);
         $metadata->date = IdfHelper::getNodeValue($node, "./date" . self::$xPathStringLength);
         $metadata->categories = IdfHelper::getNodeValueList($node, "./uvpgs/uvpg[@category and string-length(@category)!=0]/@category");
-        $metadata->steps = self::getSteps($node);
-        $metadata->negative = self::getNegative($node);
+        $metadata->steps = self::getSteps($node, $timestamp);
+        $metadata->negative = self::getNegative($node, $timestamp);
         $metadata->addresses = self::getAddresses($node, $lang);
         $metadata->bbox = self::getBBox($node, $metadata->title);
         $metadata->hasDocs = count(IdfHelper::getNodeValueList($node,"//docs/doc")) > 0;
@@ -49,7 +49,7 @@ class DetailParserMetadataIdfUVP
         }
         return $array;
     }
-    private static function getSteps(\SimpleXMLElement $node): array
+    private static function getSteps(\SimpleXMLElement $node, ?string $timestamp): array
     {
         $array = [];
         $nodes = IdfHelper::getNodeList($node, "./steps/step[./*]");
@@ -58,14 +58,14 @@ class DetailParserMetadataIdfUVP
                 $type = IdfHelper::getNodeValue($tmpNode, './@type');
                 $dateFrom = IdfHelper::getNodeValue($tmpNode, './datePeriod/from | ./date/from');
                 $dateTo = IdfHelper::getNodeValue($tmpNode, './datePeriod/to | ./date/to');
-                $technicalDocs = self::getDocs($tmpNode, './docs[@type="technicalDocs"]/doc');
-                $applicationDocs = self::getDocs($tmpNode, './docs[@type="applicationDocs"]/doc');
-                $reportsRecommendationsDocs = self::getDocs($tmpNode, './docs[@type="reportsRecommendationsDocs"]/doc');
-                $moreDocs = self::getDocs($tmpNode, './docs[@type="moreDocs"]/doc');
-                $publicationDocs = self::getDocs($tmpNode, './docs[@type="publicationDocs"]/doc');
-                $considerationDocs = self::getDocs($tmpNode, './docs[@type="considerationDocs"]/doc');
-                $approvalDocs = self::getDocs($tmpNode, './docs[@type="approvalDocs"]/doc');
-                $designDocs = self::getDocs($tmpNode, './docs[@type="designDocs"]/doc');
+                $technicalDocs = self::getDocs($tmpNode, './docs[@type="technicalDocs"]/doc', $timestamp);
+                $applicationDocs = self::getDocs($tmpNode, './docs[@type="applicationDocs"]/doc', $timestamp);
+                $reportsRecommendationsDocs = self::getDocs($tmpNode, './docs[@type="reportsRecommendationsDocs"]/doc', $timestamp);
+                $moreDocs = self::getDocs($tmpNode, './docs[@type="moreDocs"]/doc', $timestamp);
+                $publicationDocs = self::getDocs($tmpNode, './docs[@type="publicationDocs"]/doc', $timestamp);
+                $considerationDocs = self::getDocs($tmpNode, './docs[@type="considerationDocs"]/doc', $timestamp);
+                $approvalDocs = self::getDocs($tmpNode, './docs[@type="approvalDocs"]/doc', $timestamp);
+                $designDocs = self::getDocs($tmpNode, './docs[@type="designDocs"]/doc', $timestamp);
                 $item = array(
                     'type' => $type,
                     'dateFrom' => $dateFrom,
@@ -85,11 +85,11 @@ class DetailParserMetadataIdfUVP
         return $array;
     }
 
-    private static function getNegative(\SimpleXMLElement $node): array
+    private static function getNegative(\SimpleXMLElement $node, ?string $timestamp): array
     {
         $array = [];
         $dateFrom = IdfHelper::getNodeValue($node, './datePeriod/from');
-        $uvpNegativeRelevantDocs = self::getDocs($node, './docs[@type="uvpNegativeRelevantDocs"]/doc');
+        $uvpNegativeRelevantDocs = self::getDocs($node, './docs[@type="uvpNegativeRelevantDocs"]/doc', $timestamp);
         if (isset($dateFrom) || !empty($uvpNegativeRelevantDocs)) {
             return array(
                 'dateFrom' => $dateFrom,
@@ -99,7 +99,7 @@ class DetailParserMetadataIdfUVP
         return $array;
     }
 
-    private static function getDocs(\SimpleXMLElement $node, string $xpath): array
+    private static function getDocs(\SimpleXMLElement $node, string $xpath, ?string $timestamp): array
     {
         $array = [];
         $nodes = IdfHelper::getNodeList($node, $xpath);
@@ -109,6 +109,7 @@ class DetailParserMetadataIdfUVP
             $item = array(
                 'label' => $label,
                 'link' => $link,
+                'timestamp' => $timestamp,
             );
             $array[] = $item;
         }
