@@ -148,6 +148,51 @@ form:
               default: 'logs/ingrid-rss-index.out'
               size: medium
 
+        tab_uvp:
+            type: tab
+            title: PLUGIN_INGRID_GRAV_UTILS.UVP.TITLE
+            fields:
+                uvp:
+                    type: section
+                    title: PLUGIN_INGRID_GRAV_UTILS.UVP.TITLE
+                    underline: true
+
+                uvp.zip.limit:
+                    type: number
+                    label: PLUGIN_INGRID_GRAV_UTILS.UVP.ZIP_LIMIT
+                    append: in GB
+                    size: x-small
+                    default: 5
+                    validate:
+                        type: number
+                        step: 0.01
+
+                uvp.zip.scheduled_index.enabled:
+                    type: toggle
+                    label: PLUGIN_INGRID_GRAV_UTILS.UVP.ENABLE_INDEX_SCHEDULED_JOB
+                    help: PLUGIN_INGRID_GRAV_UTILS.UVP.ENABLE_INDEX_SCHEDULED_JOB_HELP
+                    highlight: 1
+                    default: 0
+                    options:
+                        1: Enabled
+                        0: Disabled
+                    validate:
+                        type: bool
+
+                uvp.zip.scheduled_index.at:
+                    type: text
+                    label: PLUGIN_INGRID_GRAV_UTILS.UVP.SCHEDULED_JOB_FREQUENCY
+                    size: medium
+                    help: Use 'cron' format
+                    default: '23 * * * *'
+                    placeholder: '23 * * * *'
+
+                uvp.zip.scheduled_index.logs:
+                    type: text
+                    label: PLUGIN_INGRID_GRAV_UTILS.UVP.SCHEDULED_JOB_LOG_FILE
+                    default: 'logs/ingrid-uvp-zip-index.out'
+                    size: medium
+
         tab_http:
           type: tab
           title: PLUGIN_INGRID_GRAV_UTILS.HTTP.TITLE
