@@ -88,6 +88,9 @@ class IngridGravUtilsPlugin extends Plugin
 
         $rss = new RssController($this->grav);
         $rss->setScheduler($e);
+
+        $uvpZip = new UVPZipController($this->grav);
+        $uvpZip->setScheduler($e);
     }
 
     /**

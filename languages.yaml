@@ -53,6 +53,16 @@ en:
         TIMEOUT:
           LABEL: Timeout Header Anfrage
           HELP: Legen Sie den Timeout für die Header Anfrage fest.
+    UVP:
+        TITLE: UVP
+        ZIP_LIMIT: Limit für das ZIP-Verzeichnis
+        ENABLE_INDEX_SCHEDULED_JOB: Aktivierung Indexierung Zeitplan-Job
+        ENABLE_INDEX_SCHEDULED_JOB_HELP: Verwende den Grav Scheduler um dem Job im Hintergrund laufen zu lassen
+        SCHEDULED_JOB_FREQUENCY: Zeitplan Frequenz
+        SCHEDULED_JOB_LOG_FILE: Zeitplan Log-Datei
+        INDEXING_ZIP: 'ZIP-Verzeichnis "%s" wird gescannt (%s).'
+        INDEXING_ZIP_DIRECTORY_SIZE: 'ZIP-Verzeichnis hat folgende Größe %s und das Limit beträgt %d GB.'
+        INDEXING_ZIP_FILE_DELETE: 'Datei "%s" wurde entfernt.'
 
 de:
   PLUGIN_INGRID_GRAV_UTILS:
@@ -109,3 +119,13 @@ de:
         TIMEOUT:
           LABEL: Timeout Header Anfrage
           HELP: Legen Sie den Timeout für die Header Anfrage fest.
+    UVP:
+        TITLE: UVP
+        ZIP_LIMIT: Limit für das ZIP-Verzeichnis
+        ENABLE_INDEX_SCHEDULED_JOB: Aktivierung Indexierung Zeitplan-Job
+        ENABLE_INDEX_SCHEDULED_JOB_HELP: Verwende den Grav Scheduler um dem Job im Hintergrund laufen zu lassen
+        SCHEDULED_JOB_FREQUENCY: Zeitplan Frequenz
+        SCHEDULED_JOB_LOG_FILE: Zeitplan Log-Datei
+        INDEXING_ZIP: 'ZIP-Verzeichnis "%s" wird gescannt. (%s)'
+        INDEXING_ZIP_DIRECTORY_SIZE: 'ZIP-Verzeichnis hat folgende Größe %s und das Limit beträgt %d GB.'
+        INDEXING_ZIP_FILE_DELETE: 'Datei "%s" wurde entfernt.'
