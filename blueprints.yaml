@@ -157,6 +157,10 @@ form:
                     title: PLUGIN_INGRID_GRAV_UTILS.UVP.TITLE
                     underline: true
 
+                uvp.zip.scheduled_index.status:
+                    type: uvp_zip_index_status
+                    label: PLUGIN_INGRID_GRAV_UTILS.UVP.ZIP_INDEX_STATUS
+
                 uvp.zip.limit:
                     type: number
                     label: PLUGIN_INGRID_GRAV_UTILS.UVP.ZIP_LIMIT

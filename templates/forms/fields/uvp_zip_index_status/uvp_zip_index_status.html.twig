@@ -1,0 +1,16 @@
+{% extends "forms/field.html.twig" %}
+
+{% block input %}
+    <div class="form-list-wrapper {{ field.size }}">
+        <div class="index-status">
+            {% if uvp_zip_index_status.status %}
+                <button id="uvp-zip-index" class="button reindex uvp-zip-reindex">{{ "PLUGIN_INGRID_GRAV_UTILS.UVP.BUTTON_ZIP_REINDEXING"|t }}</button>
+                <span class="uvp-zip-status success"><i class="fa fa-info-circle"></i> {{ uvp_zip_index_status.msg }}</span>
+            {% else %}
+                <button id="uvp-zip-index" class="button critical uvp-zip-reindex">{{ "PLUGIN_INGRID_GRAV_UTILS.UVP.BUTTON_ZIP_INDEXING"|t }}</button>
+                <span class="uvp-zip-status error"><i class="fa fa-warning"></i> {{ uvp_zip_index_status.msg }}</span>
+            {% endif %}
+            <div class="warning uvp-zip-error-details"></div>
+        </div>
+    </div>
+{% endblock %}
