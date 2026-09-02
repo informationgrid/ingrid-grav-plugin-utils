@@ -54,7 +54,7 @@ en:
           LABEL: Timeout Header Anfrage
           HELP: Legen Sie den Timeout für die Header Anfrage fest.
     UVP:
-        TITLE: UVP
+        TITLE: UVP ZIP
         ZIP_LIMIT: Limit für das ZIP-Verzeichnis
         ENABLE_INDEX_SCHEDULED_JOB: Aktivierung Indexierung Zeitplan-Job
         ENABLE_INDEX_SCHEDULED_JOB_HELP: Verwende den Grav Scheduler um dem Job im Hintergrund laufen zu lassen
@@ -63,6 +63,11 @@ en:
         INDEXING_ZIP: 'ZIP-Verzeichnis "%s" wird gescannt (%s).'
         INDEXING_ZIP_DIRECTORY_SIZE: 'ZIP-Verzeichnis hat folgende Größe %s und das Limit beträgt %d GB.'
         INDEXING_ZIP_FILE_DELETE: 'Datei "%s" wurde entfernt.'
+        ZIP_INDEX_STATUS: UVP ZIP Verzeichnis säubern
+        BUTTON_ZIP_INDEXING: Starten
+        BUTTON_ZIP_REINDEXING: Starten
+        ZIP_INDEXING_DIRECTORY_SIZE: 'Größe: %s'
+        ZIP_INDEXING_UNPERMISSION: Unzureichende Berechtigungen zum Neuindizieren.
 
 de:
   PLUGIN_INGRID_GRAV_UTILS:
@@ -120,7 +125,7 @@ de:
           LABEL: Timeout Header Anfrage
           HELP: Legen Sie den Timeout für die Header Anfrage fest.
     UVP:
-        TITLE: UVP
+        TITLE: UVP ZIP
         ZIP_LIMIT: Limit für das ZIP-Verzeichnis
         ENABLE_INDEX_SCHEDULED_JOB: Aktivierung Indexierung Zeitplan-Job
         ENABLE_INDEX_SCHEDULED_JOB_HELP: Verwende den Grav Scheduler um dem Job im Hintergrund laufen zu lassen
@@ -129,3 +134,8 @@ de:
         INDEXING_ZIP: 'ZIP-Verzeichnis "%s" wird gescannt. (%s)'
         INDEXING_ZIP_DIRECTORY_SIZE: 'ZIP-Verzeichnis hat folgende Größe %s und das Limit beträgt %d GB.'
         INDEXING_ZIP_FILE_DELETE: 'Datei "%s" wurde entfernt.'
+        ZIP_INDEX_STATUS: UVP ZIP Verzeichnis säubern
+        BUTTON_ZIP_INDEXING: Starten
+        BUTTON_ZIP_REINDEXING: Starten
+        ZIP_INDEXING_DIRECTORY_SIZE: 'Größe: %s'
+        ZIP_INDEXING_UNPERMISSION: Unzureichende Berechtigungen zum Neuindizieren.

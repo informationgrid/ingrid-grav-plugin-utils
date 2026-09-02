@@ -21,8 +21,8 @@ class UVPZipIndex
         $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.UVP.INDEXING_ZIP', $zipPath, $time]);
         if (is_dir($zipPath)) {
             $directorySize = FileHelper::getFolderSize($zipPath);
-            $directorySizeInByte = $directorySizeLimit * 1024 * 1024 * 1024;
-            if ($directorySize > $directorySizeInByte) {
+            $directorySizeLimitInByte = $directorySizeLimit * 1024 * 1024 * 1024;
+            if ($directorySize > $directorySizeLimitInByte) {
                 $msg .= PHP_EOL . $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.UVP.INDEXING_ZIP_DIRECTORY_SIZE', Utils::prettySize($directorySize), $directorySizeLimit]);
                 $files = FileHelper::sortDirectoryFilesByOldest($zipPath);
                 foreach ($files as $file) {
@@ -30,7 +30,7 @@ class UVPZipIndex
                     unlink($filepath);
                     $msg .= PHP_EOL . $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.UVP.INDEXING_ZIP_FILE_DELETE', $filepath]);
                     $directorySize = FileHelper::getFolderSize($zipPath);
-                    if ($directorySize < $directorySizeInByte) {
+                    if ($directorySize < $directorySizeLimitInByte) {
                         break;
                     }
                 }

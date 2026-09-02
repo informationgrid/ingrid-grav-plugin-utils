@@ -25,5 +25,5 @@ uvp:
         limit: 50
         scheduled_index:
             enabled: true
-            at: '0 23 * * *'
+            at: '*/30 * * * *'
             logs: logs/ingrid-uvp-zip-index.out

@@ -3,6 +3,7 @@
 namespace Grav\Plugin;
 
 use Grav\Common\Grav;
+use Grav\Common\Utils;
 use RocketTheme\Toolbox\Event\Event;
 
 class UVPZipController
@@ -11,6 +12,54 @@ class UVPZipController
 
     public function __construct(Grav $grav) {
         $this->grav = $grav;
+    }
+
+    public function getCount(): array
+    {
+        $lang = $this->grav['language'];
+        $config = $this->grav['config']->get('plugins.ingrid-grav-utils.uvp.zip');
+        $locator = $this->grav['locator'];
+        $folderPath = $locator->findResource('user-data://', true);
+        $zipPath = $folderPath . '/downloads/zip';
+        $directorySize = 0;
+        if (is_dir($zipPath)) {
+            $directorySize = FileHelper::getFolderSize($zipPath);
+        }
+        $directorySizeLimitInByte = $config['limit'] * 1024 * 1024 * 1024;
+        $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.UVP.ZIP_INDEXING_DIRECTORY_SIZE', Utils::prettySize($directorySize)]);
+        return [$directorySize < $directorySizeLimitInByte, $msg];
+    }
+
+    public function taskReindex(Event $e): void
+    {
+        $controller = $e['controller'];
+
+        header('Content-type: application/json');
+
+        if (!$controller->authorizeTask('reindexUVPZip', ['admin.configuration', 'admin.super'])) {
+            $json_response = [
+                'status'  => 'error',
+                'message' => '<i class="fa fa-warning"></i> '. self::getCount()[1],
+                'details' => $this->grav['language']->translate(['PLUGIN_INGRID_GRAV_UTILS.UVP.ZIP_INDEXING_UNPERMISSION'])
+            ];
+            echo json_encode($json_response);
+            exit;
+        }
+
+        // disable warnings
+        error_reporting(1);
+        // disable execution time
+        set_time_limit(0);
+
+        self::indexJob();
+
+        $json_response = [
+            'status'  => 'success',
+            'message' => self::getCount()[1]
+        ];
+
+        echo json_encode($json_response);
+        exit;
     }
 
     public static function indexJob(): array
