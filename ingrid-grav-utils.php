@@ -88,6 +88,9 @@ class IngridGravUtilsPlugin extends Plugin
 
         $rss = new RssController($this->grav);
         $rss->setScheduler($e);
+
+        $uvpZip = new UVPZipController($this->grav);
+        $uvpZip->setScheduler($e);
     }
 
     /**
@@ -125,6 +128,10 @@ class IngridGravUtilsPlugin extends Plugin
                 $rss = new RssController($this->grav);
                 $rss->taskReindex($e);
                 break;
+            case 'taskReindexUVPZip':
+                $uvp_zip = new UVPZipController($this->grav);
+                $uvp_zip->taskReindex($e);
+                break;
             default:
                 break;
         }
@@ -159,6 +166,13 @@ class IngridGravUtilsPlugin extends Plugin
                 $twig->twig_vars['rss_index_status'] = ['status' => $status, 'msg' => $msg];
                 $this->grav['assets']->addCss('plugin://ingrid-grav-utils/assets/admin/rss/rss.css');
                 $this->grav['assets']->addJs('plugin://ingrid-grav-utils/assets/admin/rss/rss.js');
+
+                $uvp_zip = new UVPZipController($this->grav);
+                [$status, $msg] = $uvp_zip->getCount();
+                $twig->twig_vars['uvp_zip_index_status'] = ['status' => $status, 'msg' => $msg];
+                $this->grav['assets']->addCss('plugin://ingrid-grav-utils/assets/admin/uvp-zip/uvp-zip.css');
+                $this->grav['assets']->addJs('plugin://ingrid-grav-utils/assets/admin/uvp-zip/uvp-zip.js');
+
             } catch (\Exception $e) {
                 DebugHelper::error($e->getMessage());
             }

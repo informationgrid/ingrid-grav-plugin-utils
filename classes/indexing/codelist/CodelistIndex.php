@@ -15,7 +15,6 @@ class CodelistIndex
         $lang = Grav::instance()['language'];
         DebugHelper::debug('Start job: Codelist Synchronisation');
         $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_UNSUCCESS']);
-        $status = false;
 
         $opts = [
             "http" => [
@@ -41,7 +40,6 @@ class CodelistIndex
                 );
                 self::writeJsonFile(json_encode($result, JSON_PRETTY_PRINT), "user-data://codelists", "codelists.json");
                 $msg = $lang->translate(['PLUGIN_INGRID_GRAV_UTILS.CODELIST_API.INDEXING_CODELIST_SUCCESS', count($codelists), $time]);
-                $status = true;
             } else {
                 DebugHelper::error('Codelists could not be synchronized');
                 $path = 'user-data://codelists/codelists.json';
@@ -55,7 +53,7 @@ class CodelistIndex
             }
         }
         DebugHelper::debug('Finished job: Codelist Synchronisation');
-        return [$status, $msg];
+        return ['', $msg];
     }
 
     private static function writeJsonFile(string $json, string $dir, string $file): void

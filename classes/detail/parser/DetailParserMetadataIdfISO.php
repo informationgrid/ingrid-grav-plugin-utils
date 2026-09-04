@@ -435,7 +435,16 @@ class DetailParserMetadataIdfISO
         }
 
         // Weitere Verweise
-        $xpathExpression = "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[not(./*/idf:attachedToField[@entry-id='9990']) and not(./*/idf:attachedToField[@entry-id='5066']) and not(./*/gmd:function/*/@codeListValue='download')][./*]";
+
+        // Do not filter "Verweis zum Dienst" for Geodatasets
+        $serviceFilter = $objType == "1" ? "" : " and not(./*/idf:attachedToField[@entry-id='5066'])";
+
+        $xpathExpression =
+            "./gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine["
+            . "not(./*/idf:attachedToField[@entry-id='9990'])"
+            . $serviceFilter
+            . " and not(./*/gmd:function/*/@codeListValue='download')"
+            . "][./*]";
         $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression);
         foreach ($tmpNodes as $tmpNode) {
             $url = IdfHelper::getNodeValue($tmpNode, "./*/gmd:linkage/gmd:URL");
