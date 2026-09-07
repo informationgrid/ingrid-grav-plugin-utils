@@ -67,6 +67,8 @@ class Detail
 
     public ?string $meta_url;
 
+    public ?string $website_url;
+
     public function __construct(string $oid)
     {
         $this->oid = $oid;

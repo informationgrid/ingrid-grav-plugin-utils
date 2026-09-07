@@ -2,17 +2,18 @@
 
 namespace Grav\Plugin\InGridGravUtils\Hit\Parsers;
 
+use Grav\Common\Grav;
+use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Bounds;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Content;
+use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\DataOrigin;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Detail;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Image;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\LayerService;
-use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\DataOrigin;
+use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Point;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Relation;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Sensor;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Species;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Statistic;
-use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Bounds;
-use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Point;
 
 class BipuDetailParser
 {
@@ -55,7 +56,25 @@ class BipuDetailParser
         $detail->import_date = $metadata?->created ?? null;
         $detail->modified_date = $metadata?->modified ?? null;
         $detail->meta_url = $umweltnavi->meta_url ?? null;
+        $detail->website_url = self::getWebsiteUrl($json);
 
         return $detail;
+    }
+
+    private static function getWebsiteUrl(object $json): ?string
+    {
+        try {
+            $websites = array_filter(
+                $json->references ?? [],
+                fn($ref) => $ref->type->key === 'website',
+            );
+            return empty($websites) ? null : $websites[0]->url;
+        } catch (\Throwable $e) {
+            Grav::instance()['log']->error(
+                'Failed to get website url: ' . $e->getMessage()
+            );
+            return null;
+        }
+
     }
 }
