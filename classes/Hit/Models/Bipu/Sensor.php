@@ -2,6 +2,8 @@
 
 namespace Grav\Plugin\InGridGravUtils\Hit\Models\Bipu;
 
+use Grav\Common\Grav;
+
 class Sensor
 {
     public function __construct(
@@ -19,14 +21,21 @@ class Sensor
         ?array $jsonList
     ): array
     {
-        $validValues = array_filter($jsonList ?? [],
-            fn($json) => isset($json->name) && isset($json->unit) && isset($json->property)
-        );
-        return array_map(fn($json) => new self(
-            name: $json->name,
-            unit: $json->unit,
-            property: $json->property,
-            values: Measurement::fromJsonList($json->values),
-        ), $validValues);
+        $sensors = array();
+        foreach ($jsonList ?? [] as $json) {
+            try {
+                $sensors[] = new self(
+                    name: $json->name,
+                    unit: $json->unit,
+                    property: $json->property,
+                    values: Measurement::fromJsonList($json->values ?? null),
+                );
+            } catch (\Throwable $e) {
+                Grav::instance()['log']->error(
+                    'Failed to create Sensor: ' . $e->getMessage()
+                );
+            }
+        }
+        return $sensors;
     }
 }
