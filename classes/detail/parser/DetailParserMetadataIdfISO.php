@@ -274,7 +274,7 @@ class DetailParserMetadataIdfISO
 
             $value = null;
             if (isset($westBoundLongitude) && isset($southBoundLatitude)) {
-                $value = round((float) $westBoundLongitude, 3) . "°/" . round((float) $southBoundLatitude, 3) . "°";
+                $value = round((float) $southBoundLatitude, 3) . "° / " . round((float) $westBoundLongitude, 3) . "°";
             }
             $item[] = array(
                 "value" => $value ?? '',
@@ -283,7 +283,7 @@ class DetailParserMetadataIdfISO
 
             $value = null;
             if (isset($eastBoundLongitude) && isset($northBoundLatitude)) {
-                $value = round((float) $eastBoundLongitude, 3) . "°/" . round((float) $northBoundLatitude, 3) . "°";
+                $value = round((float) $northBoundLatitude, 3) . "° / " . round((float) $eastBoundLongitude, 3) . "°";
             }
             $item[] = array(
                 "value" => $value ?? '',
