@@ -34,7 +34,7 @@ class BipuDetailParser
 
         $detail->centroid = Point::fromCentroid($spatial?->centroid ?? null);
         $detail->bounds = Bounds::fromBbox($spatial?->bbox ?? null);
-        $detail->geoJson = isset($spatial?->geometry) ? json_encode($spatial->geometry) : null;
+        $detail->geoJson = isset($spatial?->outline) ? json_encode($spatial->outline) : null;
 
         $detail->images = Image::fromJsonList($umweltnavi->content_items ?? null);
         $detail->contents = Content::fromJsonList($umweltnavi->content_items ?? null);

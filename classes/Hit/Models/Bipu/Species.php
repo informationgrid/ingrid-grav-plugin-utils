@@ -2,6 +2,8 @@
 
 namespace Grav\Plugin\InGridGravUtils\Hit\Models\Bipu;
 
+use Grav\Common\Grav;
+
 class Species
 {
     public function __construct(
@@ -42,11 +44,21 @@ class SpeciesItem
 
     static function fromJsonList(array $jsonList): array
     {
-        return array_map(fn($json) => new self(
-            name: $json->name,
-            url: $json->url,
-            image_url: $json->image?->url ?? null,
-            observed_date: $json->temporal?->date ?? null,
-        ), $jsonList);
+        $items = array();
+        foreach ($jsonList as $json) {
+            try {
+                $items[] = new self(
+                    name: $json->name,
+                    url: $json->url,
+                    image_url: $json->image?->url ?? null,
+                    observed_date: $json->temporal?->date ?? null,
+                );
+            } catch (\Throwable $e) {
+                Grav::instance()['log']->error(
+                    'Failed to create a species: ' . $e->getMessage()
+                );
+            }
+        }
+        return $items;
     }
 }
