@@ -58,6 +58,9 @@ class BipuDetailParser
         $detail->meta_url = $umweltnavi->meta_url ?? null;
         $detail->website_url = self::getWebsiteUrl($json);
 
+        // Optical attributes.
+        $detail->has_details = $umweltnavi->has_details ?? false;
+
         return $detail;
     }
 

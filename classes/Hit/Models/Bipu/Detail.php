@@ -69,6 +69,8 @@ class Detail
 
     public ?string $website_url;
 
+    public ?bool $has_details;
+
     public function __construct(string $oid)
     {
         $this->oid = $oid;
