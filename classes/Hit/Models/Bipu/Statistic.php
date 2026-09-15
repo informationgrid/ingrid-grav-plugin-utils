@@ -27,9 +27,9 @@ class Statistic
             return new Statistic(
                 id: $json->oid,
                 title: $json->name ?? $json->category?->name,
-                description: $json->info ?? null,
-                unit: $json->unit,
-                property: $json->property,
+                description: $json->info_text ?? null,
+                unit: $json->unit ?? null,
+                property: $json->property ?? null,
                 values: Measurement::fromJsonList(
                     $json->values,
                     self::getFractionDigit($json->unit ?? null)

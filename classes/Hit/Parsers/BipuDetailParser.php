@@ -9,6 +9,7 @@ use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\DataOrigin;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Detail;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Image;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\LayerService;
+use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Measurement;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Point;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Relation;
 use Grav\Plugin\InGridGravUtils\Hit\Models\Bipu\Sensor;
@@ -21,6 +22,7 @@ class BipuDetailParser
     {
         $metadata = $json->metadata ?? null;
         $umweltnavi = $json->umweltnavi;
+        $extensions = $json->extensions;
         $spatial = $json->spatials[0] ?? null;
 
         $detail = new Detail($umweltnavi->oid);
@@ -47,9 +49,9 @@ class BipuDetailParser
         $detail->dataOrigin = DataOrigin::fromJson($umweltnavi);
         $detail->partners = $umweltnavi->assigned_to ?? [];
 
-        $detail->topic = $umweltnavi->topic_hierarchy?->topics[0] ?? null;
-        $detail->subtopic = $umweltnavi->topic_hierarchy?->subtopics[0] ?? null;
-        $detail->selectcategory = $umweltnavi->topic_hierarchy?->selectcategory ?? null;
+        $detail->topic = $extensions->topic_hierarchy?->topics[0] ?? null;
+        $detail->subtopic = $extensions->topic_hierarchy?->subtopics[0] ?? null;
+        $detail->selectcategory = $extensions->topic_hierarchy?->selectcategory ?? null;
         $detail->category = $umweltnavi->category->slug;
         $detail->category_name = $umweltnavi->category->name;
 
@@ -57,6 +59,11 @@ class BipuDetailParser
         $detail->modified_date = $metadata?->modified ?? null;
         $detail->meta_url = $umweltnavi->meta_url ?? null;
         $detail->website_url = self::getWebsiteUrl($json);
+
+        // Extensions
+        if (isset($extensions->measurement_values) && !empty($detail->sensors)) {
+            self::appendMeasurements($detail->sensors, $extensions->measurement_values);
+        }
 
         // Optical attributes.
         $detail->has_details = $umweltnavi->has_details ?? false;
@@ -78,6 +85,15 @@ class BipuDetailParser
             );
             return null;
         }
+    }
 
+    private static function appendMeasurements(array $sensors, object $measurement_values): void
+    {
+        foreach ($sensors as $sensor) {
+            $values = $measurement_values->{$sensor->property};
+            if (isset($values)) {
+                $sensor->values = Measurement::fromJsonList($values);
+            }
+        }
     }
 }

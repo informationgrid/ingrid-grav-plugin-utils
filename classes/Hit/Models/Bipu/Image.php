@@ -22,6 +22,10 @@ class Image
 
         $images = array();
         foreach ($contents as $content) {
+            if (!isset($content->items)) {
+                continue;
+            }
+
             // Filter out invalid content.
             $validItems = array_filter($content->items,
                 fn($item) => isset($item->url)

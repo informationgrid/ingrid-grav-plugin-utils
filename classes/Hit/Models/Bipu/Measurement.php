@@ -17,7 +17,7 @@ class Measurement
     ): array
     {
         $validValues = array_filter($jsonList ?? [],
-            fn($json) => isset($json->value) && isset($json->display_date)
+            fn($json) => isset($json->value) && (isset($json->display_date) || isset($json->time))
         );
 
         return array_map(
@@ -44,7 +44,7 @@ class Measurement
 
         return new self(
             value: $value,
-            timestamp: $json->display_date,
+            timestamp: $json->display_date ?? $json->time,
         );
     }
 
