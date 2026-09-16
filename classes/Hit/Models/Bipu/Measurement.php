@@ -2,6 +2,8 @@
 
 namespace Grav\Plugin\InGridGravUtils\Hit\Models\Bipu;
 
+use Grav\Common\Grav;
+
 class Measurement
 {
     public function __construct(
@@ -20,10 +22,18 @@ class Measurement
             fn($json) => isset($json->value) && (isset($json->display_date) || isset($json->time))
         );
 
-        return array_map(
-            fn($json) => self::fromJson($json, $fractionDigits),
-            $validValues
-        );
+        $measurements = array();
+        foreach ($validValues as $json) {
+            try {
+                $measurements[] = self::fromJson($json, $fractionDigits);
+            } catch (\Throwable $e) {
+                Grav::instance()['log']->error(
+                    'Failed to create measurments: ' . $e->getMessage()
+                );
+            }
+        }
+
+        return $measurements;
     }
 
     static function fromJson(

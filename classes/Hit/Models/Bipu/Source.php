@@ -11,15 +11,22 @@ class Source
     {
     }
 
-    static public function fromJson(?object $json): ?Source
+    static public function fromJson(mixed $json): ?Source
     {
         if (!isset($json)) {
             return null;
         }
 
+        if (is_string($json)) {
+            return new self(
+                name: $json,
+                url: null,
+            );
+        }
+
         return new self(
-            $json->name,
-            $json->url ?? null,
+            name: $json->name,
+            url: $json->url ?? null,
         );
     }
 }

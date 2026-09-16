@@ -13,6 +13,9 @@ class Statistic
 
         /* @var Measurement[] $values */
         public array   $values,
+
+        public ?DataOrigin $dataOrigin,
+        public ?string $category,
     )
     {
     }
@@ -34,6 +37,8 @@ class Statistic
                     $json->values,
                     self::getFractionDigit($json->unit ?? null)
                 ),
+                dataOrigin: DataOrigin::fromJson($json),
+                category: $json->category?->slug ?? null,
             );
         }, $validValues);
     }
