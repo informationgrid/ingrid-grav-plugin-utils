@@ -17,7 +17,7 @@ class Content
     {
         // Filter out "Bilder" content which belongs to images.
         $contents = array_filter($jsonList ?? [],
-            fn($json) => ($json->name ?? null) !== "Bilder" && ($json->name ?? null) !== "Beschreibung" && !empty($json->items)
+            fn($json) => ($json->name ?? null) !== "Bilder" && ($json->name ?? null) !== "Herkunft" && ($json->name ?? null) !== "Beschreibung" && !empty($json->items)
         );
 
         return array_map(fn($json) => new self(
