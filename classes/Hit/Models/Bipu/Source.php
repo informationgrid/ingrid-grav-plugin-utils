@@ -5,7 +5,7 @@ namespace Grav\Plugin\InGridGravUtils\Hit\Models\Bipu;
 class Source
 {
     public function __construct(
-        public string  $name,
+        public ?string $name,
         public ?string $url,
     )
     {
@@ -24,8 +24,12 @@ class Source
             );
         }
 
+        if (empty($json->name) && empty($json->url)) {
+            return null;
+        }
+
         return new self(
-            name: $json->name,
+            name: $json->name ?? null,
             url: $json->url ?? null,
         );
     }
