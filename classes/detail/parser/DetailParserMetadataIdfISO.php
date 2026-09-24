@@ -1015,6 +1015,16 @@ class DetailParserMetadataIdfISO
                     if (!isset($tmpValue)){
                         $tmpValue = $keyword;
                     }
+
+                    // Handle Mobilithek Keywords
+                    if (str_starts_with($keyword, 'mobilithek_subcategory_')) {
+                        $searchValue = substr($keyword, strlen('mobilithek_subcategory_'));
+                        $tmpValue = CodelistHelper::getCodelistEntryByLocalisation('mobilithek', $searchValue, $lang) ?? $keyword;
+                    } elseif (str_starts_with($keyword, 'mobilithek_category_')) {
+                        $searchValue = substr($keyword, strlen('mobilithek_category_'));
+                        $tmpValue = CodelistHelper::getCodelistEntryByLocalisation('mobilithek', $searchValue, 'category') ?? $keyword;
+                    }
+
                     if (!in_array($tmpValue, $searchTerms)) {
                         $searchTerms[] = $tmpValue;
                     }
