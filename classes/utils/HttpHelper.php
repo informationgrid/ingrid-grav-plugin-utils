@@ -98,19 +98,53 @@ class HttpHelper
     public static function getHttpFile(string $url): string|bool
     {
         DebugHelper::debug('Get file for: ' . $url);
-        $remoteFile = fopen($url, 'rb');
-        if (!$remoteFile) {
-            fclose($remoteFile);
+        $grav = Grav::instance();
+        $locator = $grav['locator'];
+        $folderPath = $locator->findResource('cache://', true);
+
+        $tmpFile = tempnam($folderPath, 'download_');
+        if ($tmpFile === false) {
+            DebugHelper::error('Error create temp file.');
             return false;
         }
+        try {
+            $remoteFile = fopen($url, 'rb');
+            if ($remoteFile === false) {
+                fclose($remoteFile);
+                DebugHelper::error('Error load remote file');
+                return false;
+            }
 
-        $content = '';
-        while (!feof($remoteFile)) {
-            // Read chunk of data from remote file
-            $content .= fread($remoteFile, 4096); // Adjust chunk size as needed
+            $localFile = fopen($tmpFile, 'wb');
+            if ($localFile === false) {
+                fclose($remoteFile);
+                DebugHelper::error('Error write locale file');
+                return false;
+            }
+            try {
+                while (!feof($remoteFile)) {
+                    $chunk = fread($remoteFile, 4096);
+
+                    if ($chunk === false) {
+                        return false;
+                    }
+
+                    if ($chunk !== '') {
+                        $written = fwrite($localFile, $chunk);
+
+                        if ($written === false || $written !== strlen($chunk)) {
+                            return false;
+                        }
+                    }
+                }
+            } finally {
+                fclose($remoteFile);
+                fclose($localFile);
+            }
+        } catch (\Throwable $e) {
+            return false;
         }
-        fclose($remoteFile);
-        return $content;
+        return $tmpFile;
     }
 
 }

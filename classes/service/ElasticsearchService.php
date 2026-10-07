@@ -344,7 +344,7 @@ class ElasticsearchService
                                         )
                                     );
                                 } else {
-                                    if ($value) {
+                                    if ($value && isset($foundObject['facets'][$value])) {
                                         $shouldGroup[] = $foundObject['facets'][$value]['query']['filter'];
                                     }
                                 }
