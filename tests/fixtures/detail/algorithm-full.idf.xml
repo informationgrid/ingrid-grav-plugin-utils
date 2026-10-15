@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Hand-crafted sample IDF for doctype "InGridAlgorithm" (obj_class 7).
+    Modeled after the editor export templates:
+      - templates/export/template-idf.jte (envelope)
+      - templates/export/ingrid/idf/shared-general.jte (ISO 19139 core)
+      - templates/export/ingrid/idf/idf-algorithm.jte + algorithmInputOutput.jte (alg block)
+    Enum values (algorithmType, typeOfUse) are expected to be localized by the editor export.
+-->
+<idf:html xmlns:idf="http://www.portalu.de/IDF/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" idf-version="3.6.1"
+          xsi:schemaLocation="http://www.portalu.de/IDF/1.0 ingrid_detail_data_schema.xsd">
+    <idf:head/>
+    <idf:body>
+        <idf:idfMdMetadata xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                           xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                           xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:igctx="https://www.ingrid-oss.eu/schemas/igctx"
+                           xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink"
+                           uuid="d967e83f-5336-4207-960c-3a6a900d0211">
+                <gmd:fileIdentifier>
+                    <gco:CharacterString>d967e83f-5336-4207-960c-3a6a900d0211</gco:CharacterString>
+                </gmd:fileIdentifier>
+                <gmd:language>
+                    <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="ger"/>
+                </gmd:language>
+                <gmd:characterSet>
+                    <gmd:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode"
+                                             codeListValue="utf8"/>
+                </gmd:characterSet>
+                <gmd:hierarchyLevel>
+                    <gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode"
+                                      codeListValue="application">application
+                    </gmd:MD_ScopeCode>
+                </gmd:hierarchyLevel>
+                <gmd:hierarchyLevelName>
+                    <gco:CharacterString>algorithm</gco:CharacterString>
+                </gmd:hierarchyLevelName>
+                <gmd:contact>
+                    <gmd:CI_ResponsibleParty>
+                        <gmd:organisationName>
+                            <gco:CharacterString>Beispielbehörde</gco:CharacterString>
+                        </gmd:organisationName>
+                        <gmd:contactInfo>
+                            <gmd:CI_Contact>
+                                <gmd:address>
+                                    <gmd:CI_Address>
+                                        <gmd:electronicMailAddress>
+                                            <gco:CharacterString>kontakt@example.org</gco:CharacterString>
+                                        </gmd:electronicMailAddress>
+                                    </gmd:CI_Address>
+                                </gmd:address>
+                            </gmd:CI_Contact>
+                        </gmd:contactInfo>
+                        <gmd:role>
+                            <gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode"
+                                             codeListValue="pointOfContact">pointOfContact
+                            </gmd:CI_RoleCode>
+                        </gmd:role>
+                    </gmd:CI_ResponsibleParty>
+                </gmd:contact>
+                <gmd:dateStamp>
+                    <gco:Date>2026-10-14</gco:Date>
+                </gmd:dateStamp>
+                <gmd:metadataStandardName>
+                    <gco:CharacterString>ISO 19115</gco:CharacterString>
+                </gmd:metadataStandardName>
+                <gmd:metadataStandardVersion>
+                    <gco:CharacterString>2003/Cor.1:2006</gco:CharacterString>
+                </gmd:metadataStandardVersion>
+                <gmd:identificationInfo>
+                    <gmd:MD_DataIdentification>
+                        <gmd:citation>
+                            <gmd:CI_Citation>
+                                <gmd:title>
+                                    <gco:CharacterString>Beispiel-Algorithmus zur Flutschutzvorhersage</gco:CharacterString>
+                                </gmd:title>
+                                <gmd:date>
+                                    <gmd:CI_Date>
+                                        <gmd:date>
+                                            <gco:Date>2020-12-11</gco:Date>
+                                        </gmd:date>
+                                        <gmd:dateType>
+                                            <gmd:CI_DateTypeCode codeListValue="creation">creation</gmd:CI_DateTypeCode>
+                                        </gmd:dateType>
+                                    </gmd:CI_Date>
+                                </gmd:date>
+                            </gmd:CI_Citation>
+                        </gmd:citation>
+                        <gmd:descriptiveKeywords>
+                            <gmd:MD_Keywords>
+                                <gmd:keyword>
+                                    <gco:CharacterString>Algorithmus</gco:CharacterString>
+                                </gmd:keyword>
+                            </gmd:MD_Keywords>
+                        </gmd:descriptiveKeywords>
+                        <gmd:supplementalInformation>
+                            <gco:CharacterString>Allgemeine Zusatzinformation zum Algorithmus</gco:CharacterString>
+                        </gmd:supplementalInformation>
+                        <gmd:supplementalInformation>
+                            <alg:Algorithm_Metadata xmlns:alg="https://www.ingrid-oss.eu/schemas/algorithmmd">
+                                <alg:trainingData>
+                                    <gco:CharacterString>Historische Wasserstands- und Niederschlagsdaten der Jahre 1990-2020</gco:CharacterString>
+                                </alg:trainingData>
+                                <alg:dataBias>
+                                    <gco:CharacterString>Systematische Unterschätzung von Extremereignissen über ein 100-jährliches Wiederkehrintervall hinaus</gco:CharacterString>
+                                </alg:dataBias>
+                                <alg:inputData>
+                                    <alg:InputData>
+                                        <alg:name>
+                                            <gco:CharacterString>Pegelmesswerte</gco:CharacterString>
+                                        </alg:name>
+                                        <alg:url>
+                                            <gco:CharacterString>https://example.org/datasets/pegelmesswerte</gco:CharacterString>
+                                        </alg:url>
+                                        <alg:attributes>
+                                            <alg:Attribute>
+                                                <alg:name>
+                                                    <gco:CharacterString>Wasserstand</gco:CharacterString>
+                                                </alg:name>
+                                                <alg:unit>
+                                                    <gco:CharacterString>cm</gco:CharacterString>
+                                                </alg:unit>
+                                                <alg:spatialResolution>
+                                                    <gco:CharacterString>Messpegel</gco:CharacterString>
+                                                </alg:spatialResolution>
+                                                <alg:temporalResolution>
+                                                    <gco:CharacterString>15 Minuten</gco:CharacterString>
+                                                </alg:temporalResolution>
+                                            </alg:Attribute>
+                                            <alg:Attribute>
+                                                <alg:name>
+                                                    <gco:CharacterString>Abfluss</gco:CharacterString>
+                                                </alg:name>
+                                                <alg:unit>
+                                                    <gco:CharacterString>m³/s</gco:CharacterString>
+                                                </alg:unit>
+                                            </alg:Attribute>
+                                        </alg:attributes>
+                                    </alg:InputData>
+                                    <alg:InputData>
+                                        <alg:name>
+                                            <gco:CharacterString>Niederschlagsprognose</gco:CharacterString>
+                                        </alg:name>
+                                    </alg:InputData>
+                                </alg:inputData>
+                                <alg:outputData>
+                                    <alg:InputData>
+                                        <alg:name>
+                                            <gco:CharacterString>Vorhergesagter Wasserstand</gco:CharacterString>
+                                        </alg:name>
+                                        <alg:url>
+                                            <gco:CharacterString>https://example.org/datasets/wasserstandsprognose</gco:CharacterString>
+                                        </alg:url>
+                                        <alg:attributes>
+                                            <alg:Attribute>
+                                                <alg:name>
+                                                    <gco:CharacterString>Wasserstand</gco:CharacterString>
+                                                </alg:name>
+                                                <alg:unit>
+                                                    <gco:CharacterString>cm</gco:CharacterString>
+                                                </alg:unit>
+                                                <alg:temporalResolution>
+                                                    <gco:CharacterString>1 Stunde</gco:CharacterString>
+                                                </alg:temporalResolution>
+                                            </alg:Attribute>
+                                        </alg:attributes>
+                                    </alg:InputData>
+                                </alg:outputData>
+                                <alg:algorithmType>
+                                    <gco:CharacterString>Regelbasiert</gco:CharacterString>
+                                </alg:algorithmType>
+                                <alg:explanation>
+                                    <gco:CharacterString>Der Algorithmus kombiniert gemessene Wasserstände mit Niederschlagsprognosen zu einer Vorhersage der Hochwasserentwicklung.</gco:CharacterString>
+                                </alg:explanation>
+                                <alg:method>
+                                    <gco:CharacterString>Autoregressives Modell</gco:CharacterString>
+                                </alg:method>
+                                <alg:method>
+                                    <gco:CharacterString>Regression auf Basis der letzten 24 Stunden Messwerte</gco:CharacterString>
+                                </alg:method>
+                                <alg:errorBias>
+                                    <gco:CharacterString>Mittlere Abweichung der Vorhersage von den Messwerten: ±5 cm</gco:CharacterString>
+                                </alg:errorBias>
+                                <alg:monitoring>
+                                    <gco:CharacterString>Wöchentlicher Abgleich der Vorhersage mit den gemessenen Wasserständen</gco:CharacterString>
+                                </alg:monitoring>
+                                <alg:typeOfUse>
+                                    <gco:CharacterString>Vorhersagend</gco:CharacterString>
+                                </alg:typeOfUse>
+                                <alg:apiUrl>
+                                    <gco:CharacterString>https://example.org/api/flood-forecast</gco:CharacterString>
+                                </alg:apiUrl>
+                                <alg:sourceCodeUrl>
+                                    <gco:CharacterString>https://github.com/example/flood-forecast</gco:CharacterString>
+                                </alg:sourceCodeUrl>
+                                <alg:websiteUrl>
+                                    <gco:CharacterString>https://example.org/hochwasser-vorhersage</gco:CharacterString>
+                                </alg:websiteUrl>
+                                <alg:exampleUrl>
+                                    <gco:CharacterString>https://example.org/hochwasser-vorhersage/beispiel</gco:CharacterString>
+                                </alg:exampleUrl>
+                                <alg:publiccodeUrl>
+                                    <gco:CharacterString>https://publiccode.example.org/flood-forecast</gco:CharacterString>
+                                </alg:publiccodeUrl>
+                                <alg:additionalUrl>
+                                    <alg:name>
+                                        <gco:CharacterString>Methodendokumentation</gco:CharacterString>
+                                    </alg:name>
+                                    <alg:url>
+                                        <gco:CharacterString>https://example.org/dokumentation.pdf</gco:CharacterString>
+                                    </alg:url>
+                                </alg:additionalUrl>
+                                <alg:additionalUrl>
+                                    <alg:name>
+                                        <gco:CharacterString>Validierungsbericht</gco:CharacterString>
+                                    </alg:name>
+                                    <alg:url>
+                                        <gco:CharacterString>https://example.org/validierung.pdf</gco:CharacterString>
+                                    </alg:url>
+                                </alg:additionalUrl>
+                            </alg:Algorithm_Metadata>
+                        </gmd:supplementalInformation>
+                    </gmd:MD_DataIdentification>
+                </gmd:identificationInfo>
+            <idf:abstract>
+                <gco:CharacterString>Beispiel-Algorithmus zur Vorhersage von Hochwasserereignissen auf Basis von Pegel- und Niederschlagsdaten.</gco:CharacterString>
+            </idf:abstract>
+        </idf:idfMdMetadata>
+    </idf:body>
+</idf:html>

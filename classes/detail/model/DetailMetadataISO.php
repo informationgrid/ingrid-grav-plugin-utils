@@ -127,6 +127,22 @@ use AllowDynamicProperties;
     public ?string $metadataStandardVersion;
     public ?string $metadataCharacterSet;
     public ?array $hierarchyLevelNames;
+    public ?string $algorithmType;
+    public ?string $algorithmExplanation;
+    public ?array $algorithmMethods;
+    public ?string $algorithmTrainingData;
+    public ?string $algorithmDataBias;
+    public ?string $algorithmErrorBias;
+    public ?string $algorithmMonitoring;
+    public ?string $algorithmTypeOfUse;
+    public ?string $algorithmApiUrl;
+    public ?string $algorithmSourceCodeUrl;
+    public ?string $algorithmWebsiteUrl;
+    public ?string $algorithmExampleUrl;
+    public ?string $algorithmPubliccodeUrl;
+    public ?array $algorithmInputData;
+    public ?array $algorithmOutputData;
+    public ?array $algorithmAdditionalUrls;
 
     public function __construct(string $uuid)
     {

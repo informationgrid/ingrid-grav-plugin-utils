@@ -48,6 +48,7 @@ class DetailParserMetadataIdfISO
         self::getUseRefs($node, $metadata, $lang);
         self::getKeywords($node, $metadata, $lang);
         self::getInfoRefs($node, $metadata->metaClass, $metadata, $lang);
+        self::getAlgorithmRefs($node, $metadata);
         self::getDataQualityRefs($node, $metadata);
         self::getAdditionalFields($node, $metadata, $lang);
         self::getMetaInfoRefs($node, $uuid, $dataSourceName, $providers, $metadata, $lang);
@@ -82,8 +83,10 @@ class DetailParserMetadataIdfISO
         if (isset($hierachyLevelNode)) {
             $hierachyLevel = IdfHelper::getNode($hierachyLevelNode, "./@codeListValue");
         }
-        $hierachyLevelName = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevelName/*[self::gco:CharacterString or self::gmx:Anchor]");
-        if (strcasecmp($hierachyLevel, "service") == 0){
+        $hierachyLevelName = IdfHelper::getNodeValue($node, "./gmd:hierarchyLevelName/*[self::gco:CharacterString or self::gmx:Anchor]") ?? "";
+        if (strcasecmp($hierachyLevelName, "algorithm") == 0){
+            return "7";
+        } else if (strcasecmp($hierachyLevel, "service") == 0){
             return "3";
         } else if (strcasecmp($hierachyLevel, "application") == 0){
             return "6";
@@ -857,6 +860,82 @@ class DetailParserMetadataIdfISO
                 "service_time" => $service_time,
             );
             $array[] = $item;
+        }
+        return $array;
+    }
+
+    private static function getAlgorithmRefs(\SimpleXMLElement $node, DetailMetadataISO &$metadata): void
+    {
+        $xpathExpression = "./gmd:identificationInfo/*/gmd:supplementalInformation/alg:Algorithm_Metadata";
+
+        $metadata->algorithmType = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:algorithmType/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmTypeOfUse = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:typeOfUse/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmExplanation = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:explanation/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmMethods = IdfHelper::getNodeValueList($node, $xpathExpression . "/alg:method/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmTrainingData = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:trainingData/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmDataBias = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:dataBias/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmErrorBias = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:errorBias/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmMonitoring = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:monitoring/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmApiUrl = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:apiUrl/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmSourceCodeUrl = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:sourceCodeUrl/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmWebsiteUrl = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:websiteUrl/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmExampleUrl = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:exampleUrl/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmPubliccodeUrl = IdfHelper::getNodeValue($node, $xpathExpression . "/alg:publiccodeUrl/*[self::gco:CharacterString or self::gmx:Anchor]");
+        $metadata->algorithmInputData = self::getAlgorithmInputOutputRefs($node, $xpathExpression . "/alg:inputData");
+        $metadata->algorithmOutputData = self::getAlgorithmInputOutputRefs($node, $xpathExpression . "/alg:outputData");
+        $metadata->algorithmAdditionalUrls = self::getAlgorithmAdditionalUrlRefs($node, $xpathExpression);
+    }
+
+    private static function getAlgorithmInputOutputRefs(\SimpleXMLElement $node, string $xpathExpression): array
+    {
+        $array = [];
+        $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression . "/alg:InputData");
+        foreach ($tmpNodes as $tmpNode) {
+            $array[] = [
+                "name" => IdfHelper::getNodeValue($tmpNode, "./alg:name/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "url" => IdfHelper::getNodeValue($tmpNode, "./alg:url/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "attributes" => self::getAlgorithmAttributeRefs($tmpNode)
+            ];
+        }
+        return $array;
+    }
+
+    private static function getAlgorithmAttributeRefs(\SimpleXMLElement $node): array
+    {
+        $array = [];
+        $tmpNodes = IdfHelper::getNodeList($node, "./alg:attributes/alg:Attribute");
+        foreach ($tmpNodes as $tmpNode) {
+            $array[] = [
+                [
+                    "value" => IdfHelper::getNodeValue($tmpNode, "./alg:name/*[self::gco:CharacterString or self::gmx:Anchor]") ?? "",
+                    "type" => "text"
+                ],
+                [
+                    "value" => IdfHelper::getNodeValue($tmpNode, "./alg:unit/*[self::gco:CharacterString or self::gmx:Anchor]") ?? "",
+                    "type" => "text"
+                ],
+                [
+                    "value" => IdfHelper::getNodeValue($tmpNode, "./alg:spatialResolution/*[self::gco:CharacterString or self::gmx:Anchor]") ?? "",
+                    "type" => "text"
+                ],
+                [
+                    "value" => IdfHelper::getNodeValue($tmpNode, "./alg:temporalResolution/*[self::gco:CharacterString or self::gmx:Anchor]") ?? "",
+                    "type" => "text"
+                ]
+            ];
+        }
+        return $array;
+    }
+
+    private static function getAlgorithmAdditionalUrlRefs(\SimpleXMLElement $node, string $xpathExpression): array
+    {
+        $array = [];
+        $tmpNodes = IdfHelper::getNodeList($node, $xpathExpression . "/alg:additionalUrl");
+        foreach ($tmpNodes as $tmpNode) {
+            $array[] = [
+                "name" => IdfHelper::getNodeValue($tmpNode, "./alg:name/*[self::gco:CharacterString or self::gmx:Anchor]"),
+                "url" => IdfHelper::getNodeValue($tmpNode, "./alg:url/*[self::gco:CharacterString or self::gmx:Anchor]")
+            ];
         }
         return $array;
     }

@@ -19,6 +19,7 @@ class IdfHelper
         $node->registerXPathNamespace('xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         $node->registerXPathNamespace('igctx', 'https://www.ingrid-oss.eu/schemas/igctx');
         $node->registerXPathNamespace('baw', 'https://dl.datenrepository.baw.de/schemas/bawmd');
+        $node->registerXPathNamespace('alg', 'https://www.ingrid-oss.eu/schemas/algorithmmd');
     }
 
     public static function getNode(\SimpleXMLElement $node, string $xpath): ?\SimpleXMLElement
