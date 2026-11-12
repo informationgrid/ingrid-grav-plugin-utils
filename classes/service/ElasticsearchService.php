@@ -17,7 +17,8 @@ class ElasticsearchService
         int    $hitsNum,
         array  $selectedFacets,
         array  $addToSearch,
-        bool   $sortByDate,
+        string $sortOption,
+        array  $sortOptions,
         array  $queryFields,
         string $queryStringOperator,
         array  $requestedFields = [],
@@ -42,14 +43,9 @@ class ElasticsearchService
 
         // Build sort query.
         $sortQuery = array(
-            "_score"
         );
-        if ($sortByDate) {
-            $sortQuery = array(
-                "modified" => array(
-                    "order" => "desc"
-                )
-            );
+        if (!empty($sortOption)) {
+            $sortQuery = $sortOptions[$sortOption]['sort'];
         }
 
         $source = [];
