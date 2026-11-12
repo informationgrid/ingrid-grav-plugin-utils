@@ -37,7 +37,7 @@ class Image
                 try {
                     $validImages[] = new Image(
                         url: $item->url,
-                        title: $item->title,
+                        title: $item->title ?? null,
                         description: $item->description ?? null,
                         dataOrigin: DataOrigin::fromJson($item)
                     );
