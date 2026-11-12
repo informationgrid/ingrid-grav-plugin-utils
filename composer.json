@@ -36,6 +36,7 @@
       "classes/utils/ElasticsearchHelper.php",
       "classes/utils/GeoHelper.php",
       "classes/utils/FileHelper.php",
+      "classes/utils/BwastrHelper.php",
       "classes/detail/parser/DetailParserAddressIdfISO.php",
       "classes/detail/parser/DetailParserMetadataIdfISO.php",
       "classes/detail/parser/DetailParserMetadataIdfUVP.php",

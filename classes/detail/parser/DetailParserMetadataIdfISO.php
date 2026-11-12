@@ -166,7 +166,7 @@ class DetailParserMetadataIdfISO
         $metadata->polygonWkts = $polygonWkts;
         $metadata->polygonGeojsons = $polygonGeojsons;
         $metadata->bboxes = self::getBBoxes($node, $metadata->title);
-        $metadata->bwastrs = self::getBwaStrs($node);
+        $metadata->bwastrs = self::getBwaStrs($node, $lang);
         $metadata->geographicElement = self::getGeographicElements($node, $lang);
         $metadata->areaHeight = self::getAreaHeight($node, $lang);
         $metadata->referenceSystemId = self::getReferences($node);
@@ -237,29 +237,14 @@ class DetailParserMetadataIdfISO
         return $array;
     }
 
-    private static function getBwaStrs(\SimpleXMLElement $node): array
+    private static function getBwaStrs(\SimpleXMLElement $node, string $lang): array
     {
         $array = [];
         $tmpNodes = IdfHelper::getNodeValueList($node, "./gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/*[self::gco:CharacterString or self::gmx:Anchor]");
         foreach ($tmpNodes as $tmpNode) {
-            $values = preg_replace('/[^-?0-9.0-9]+/', '', $tmpNode);
-            $values = str_replace('-', ' ', $values);
-            $values = explode(' ', trim($values));
-            if (!empty(reset($values))) {
-                $id = $values[0];
-                $from = $values[1] ?? '';
-                $to = $values[2] ?? '';
-
-                if (str_ends_with($id, '00')) {
-                    $id = substr($id, 0, -2);
-                    $id = $id . '01';
-                }
-
-                $array[] = array(
-                    "id" => $id,
-                    "from" => $from,
-                    "to" => $to
-                );
+            $code = BwastrHelper::parseCode($tmpNode);
+            if ($code) {
+                $array[] = BwastrHelper::resolve($code['id'], $code['from'], $code['to'], $lang);
             }
         }
         return $array;
