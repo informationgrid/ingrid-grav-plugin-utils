@@ -57,6 +57,7 @@ class DetailParserMetadataIdfISO
         $metadata->isOpendata = in_array(strtolower('opendata'), array_map('strtolower', $metadata->searchTerms)) ||
             in_array(strtolower('opendataident'), array_map('strtolower', $metadata->searchTerms));
         $metadata->isHVD = count($metadata->hvd) > 0;
+        $metadata->isIZG = in_array(strtolower('izg-relevant'), array_map('strtolower', $metadata->searchTerms));
         $metadata->hierarchyLevelNames = IdfHelper::getNodeValueList($node, "./gmd:hierarchyLevelName/*[self::gco:CharacterString or self::gmx:Anchor or .]");
 
         return $metadata;
