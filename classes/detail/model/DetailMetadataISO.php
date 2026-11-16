@@ -18,6 +18,7 @@ use AllowDynamicProperties;
     public bool $isInspire;
     public bool $isOpendata;
     public bool $isHVD;
+    public bool $isIZG;
     public ?array $previews;
     public ?string $mapUrl;
     public ?array  $links;
