@@ -15,6 +15,32 @@ class Image
     {
     }
 
+    // The attriubte [previews] from metadata.
+    static function fromPreviews(?array $previews): array
+    {
+        $images = array();
+
+        if (empty($previews)) {
+            return $images;
+        }
+
+        foreach ($previews as $preview) {
+            $preview = (object) $preview;
+
+            if (!isset($preview->url)) {
+                continue;
+            }
+
+            $images[] = new Image(
+                url: $preview->url,
+                title: $preview->title ?? null,
+                description: $preview->descr ?? null,
+                dataOrigin: null,
+            );
+        }
+        return $images;
+    }
+
     static function fromJsonList(?array $jsonList): array
     {
         // Find out "Bilder" content.
