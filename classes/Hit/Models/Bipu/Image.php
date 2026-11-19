@@ -15,6 +15,13 @@ class Image
     {
     }
 
+    // Scaled-down version of the image, e.g. for thumbnails.
+    public function getPreviewUrl(int $height = 500): string
+    {
+        $separator = str_contains($this->url, '?') ? '&' : '?';
+        return $this->url . $separator . 'height=' . $height;
+    }
+
     // The attriubte [previews] from metadata.
     static function fromPreviews(?array $previews): array
     {
